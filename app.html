@@ -605,12 +605,16 @@ async function loadProposals() {
     }
 
     const now = Math.floor(Date.now() / 1000);
+    let activeCount = 0;
+    let totalVotes = 0;
     let html = '';
     proposals.forEach(p => {
       const total = p.yes_votes + p.no_votes;
+      totalVotes += total;
       const yesPct = total > 0 ? Math.round(p.yes_votes / total * 100) : 0;
       const noPct = total > 0 ? Math.round(p.no_votes / total * 100) : 0;
       const isActive = !p.resolved && now < p.deadline;
+      if (isActive) activeCount++;
       const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : 'status-active';
       const statusText = p.resolved ? p.result : 'ACTIVE';
 
@@ -634,6 +638,10 @@ async function loadProposals() {
       '</div>';
     });
     list.innerHTML = html;
+
+    // Update stats
+    document.getElementById('statActive').textContent = activeCount;
+    document.getElementById('statVoters').textContent = totalVotes;
 
   } catch (err) {
     list.innerHTML = '<div class="loading">Error loading proposals: ' + err.message + '</div>';
@@ -733,6 +741,7 @@ async function castVote(proposalId, vote) {
     });
     showOutput('createOutput', `Vote "${vote}" cast on ${proposalId}!\nTx: ${result.transactionHash}`, false);
     await loadProposals();
+    await loadStats();
   } catch (err) {
     showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
   }
