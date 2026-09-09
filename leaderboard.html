@@ -54,39 +54,24 @@
 
     .spacer { flex: 1; }
 
-    .btn {
+    .wallet-btn {
       display: inline-flex;
       align-items: center;
-      height: 58px;
-      border-radius: 0;
-      padding: 12px 10px 12px 22px;
-      gap: 18px;
-      font-size: 16px;
-      font-weight: 500;
-      letter-spacing: -0.015em;
-      line-height: 1;
-      white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-      text-decoration: none;
+      gap: 8px;
+      background: var(--blue);
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .btn--nav {
-      background: #006cd2;
-      color: white;
-    }
-
-    .btn__icon {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0053a3;
-      color: white;
-    }
-
-    .btn__icon svg { width: 14px; height: 14px; }
+    .wallet-btn:hover { background: #6BA0FF; }
+    .wallet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .wallet-btn.connected { background: #10b981; }
 
     @media (max-width: 700px) {
       .nav-links { display: none; }
@@ -157,6 +142,13 @@
     .stat { font-weight: 600; font-size: 0.9rem; text-align: center; }
     .stat-label-sm { font-size: 0.7rem; color: var(--muted); text-align: center; }
 
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+
     /* Footer */
     footer { border-top: 1px solid var(--hairline); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; }
@@ -184,14 +176,7 @@
 
   <div class="spacer"></div>
 
-  <a href="app.html" class="btn btn--nav">
-    <span class="btn__label">Launch App</span>
-    <span class="btn__icon">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 10h10.2M10.4 5.6 15.2 10l-4.8 4.4" />
-      </svg>
-    </span>
-  </a>
+  <button id="walletBtn" class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
 </nav>
 
 <main class="main">
@@ -208,70 +193,8 @@
       <div>Proposals</div>
       <div>Success Rate</div>
     </div>
-    <div class="leaderboard-row">
-      <div class="rank top">1</div>
-      <div class="user">
-        <div class="user-avatar">0x</div>
-        <div>
-          <div class="user-name">Alice</div>
-          <div class="user-address">0x782a...f01a</div>
-        </div>
-      </div>
-      <div class="stat">47</div>
-      <div class="stat">12</div>
-      <div class="stat">92%</div>
-    </div>
-    <div class="leaderboard-row">
-      <div class="rank top">2</div>
-      <div class="user">
-        <div class="user-avatar">0x</div>
-        <div>
-          <div class="user-name">Bob</div>
-          <div class="user-address">0x3318...733e</div>
-        </div>
-      </div>
-      <div class="stat">38</div>
-      <div class="stat">8</div>
-      <div class="stat">88%</div>
-    </div>
-    <div class="leaderboard-row">
-      <div class="rank top">3</div>
-      <div class="user">
-        <div class="user-avatar">0x</div>
-        <div>
-          <div class="user-name">Charlie</div>
-          <div class="user-address">0xe98e...e836</div>
-        </div>
-      </div>
-      <div class="stat">29</div>
-      <div class="stat">15</div>
-      <div class="stat">85%</div>
-    </div>
-    <div class="leaderboard-row">
-      <div class="rank">4</div>
-      <div class="user">
-        <div class="user-avatar">0x</div>
-        <div>
-          <div class="user-name">Diana</div>
-          <div class="user-address">0xa48c...4054</div>
-        </div>
-      </div>
-      <div class="stat">24</div>
-      <div class="stat">6</div>
-      <div class="stat">83%</div>
-    </div>
-    <div class="leaderboard-row">
-      <div class="rank">5</div>
-      <div class="user">
-        <div class="user-avatar">0x</div>
-        <div>
-          <div class="user-name">Eve</div>
-          <div class="user-address">0xed68...038f</div>
-        </div>
-      </div>
-      <div class="stat">19</div>
-      <div class="stat">4</div>
-      <div class="stat">80%</div>
+    <div id="leaderboardList">
+      <div class="loading">Connect wallet to view leaderboard</div>
     </div>
   </div>
 </main>
@@ -281,6 +204,159 @@
   <div>© 2026 VotingDAO — Built on GenLayer</div>
   <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x20f8d6cB56f922C973b9A7D7479E9452A61217BE</div>
 </footer>
+
+<script type="module">
+import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
+
+const CONTRACT = '0x20f8d6cB56f922C973b9A7D7479E9452A61217BE';
+const BRADBURY_CHAIN_ID = '0x107D';
+
+let client = null;
+let account = null;
+
+window.connectWallet = connectWallet;
+
+function detectWallet() {
+  if (typeof window === 'undefined') return null;
+  if (window.rabby) return window.rabby.provider || window.ethereum;
+  if (window.ethereum?.isRabby) return window.ethereum;
+  if (window.ethereum?.isMetaMask) return window.ethereum;
+  if (window.ethereum) return window.ethereum;
+  return null;
+}
+
+async function connectWallet() {
+  const btn = document.getElementById('walletBtn');
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+
+  try {
+    const provider = detectWallet();
+    if (!provider) {
+      alert('No wallet detected. Please install MetaMask or Rabby.');
+      btn.disabled = false;
+      btn.textContent = 'Connect Wallet';
+      return;
+    }
+
+    const currentChainId = await provider.request({ method: 'eth_chainId' });
+    if (currentChainId !== BRADBURY_CHAIN_ID) {
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BRADBURY_CHAIN_ID }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BRADBURY_CHAIN_ID,
+              chainName: 'GenLayer Bradbury Testnet',
+              rpcUrls: ['https://rpc-bradbury.genlayer.com'],
+              nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
+              blockExplorerUrls: ['https://explorer-bradbury.genlayer.com'],
+            }],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) {
+      alert('No accounts found. Please unlock your wallet.');
+      btn.disabled = false;
+      btn.textContent = 'Connect Wallet';
+      return;
+    }
+
+    account = accounts[0];
+    client = createClient({ chain: chains.testnetBradbury, account });
+
+    btn.textContent = account.slice(0, 6) + '...' + account.slice(-4);
+    btn.classList.add('connected');
+    btn.disabled = false;
+
+    await loadLeaderboard();
+
+  } catch (err) {
+    console.error('Connection failed:', err);
+    alert('Connection failed: ' + (err.message || 'Unknown error'));
+    btn.disabled = false;
+    btn.textContent = 'Connect Wallet';
+  }
+}
+
+async function loadLeaderboard() {
+  const list = document.getElementById('leaderboardList');
+  list.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+
+  try {
+    // Read on-chain data for known voter addresses
+    // In production, you'd index events or use a subgraph
+    const voters = [
+      { address: '0x782abaE1C6C4aec093C964785a4c10C0991Fa01A', name: 'Alice' },
+      { address: '0x3318A9B8a152E3b3c0375d805F1F62DA8414733e', name: 'Bob' },
+      { address: '0xe98e4180C86127467830aF20d0e4cDa66848E836', name: 'Charlie' },
+      { address: '0xa48cB03fa231F3c3D5BE735d4e40cDDD4054E4CA', name: 'Diana' },
+      { address: '0xED68b3Bf65C45073152359274beA42DD96Cd038f', name: 'Eve' },
+    ];
+
+    let rows = [];
+    for (const voter of voters) {
+      try {
+        const registered = await client.readContract({
+          address: CONTRACT,
+          functionName: 'is_voter',
+          args: [voter.address],
+        });
+        if (registered === 'true') {
+          rows.push({
+            ...voter,
+            votes: Math.floor(Math.random() * 50) + 10, // Placeholder - real data from events
+            proposals: Math.floor(Math.random() * 15) + 1,
+            success: Math.floor(Math.random() * 20) + 80,
+          });
+        }
+      } catch (e) {
+        // Skip
+      }
+    }
+
+    if (rows.length === 0) {
+      list.innerHTML = '<div class="loading">No registered voters found on-chain</div>';
+      return;
+    }
+
+    // Sort by votes
+    rows.sort((a, b) => b.votes - a.votes);
+
+    let html = '';
+    rows.forEach((row, i) => {
+      const rankClass = i < 3 ? 'rank top' : 'rank';
+      html += '<div class="leaderboard-row">' +
+        '<div class="' + rankClass + '">' + (i + 1) + '</div>' +
+        '<div class="user">' +
+          '<div class="user-avatar">0x</div>' +
+          '<div>' +
+            '<div class="user-name">' + row.name + '</div>' +
+            '<div class="user-address">' + row.address.slice(0, 6) + '...' + row.address.slice(-4) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="stat">' + row.votes + '</div>' +
+        '<div class="stat">' + row.proposals + '</div>' +
+        '<div class="stat">' + row.success + '%</div>' +
+      '</div>';
+    });
+    list.innerHTML = html;
+
+  } catch (err) {
+    list.innerHTML = '<div class="loading">Error loading leaderboard: ' + err.message + '</div>';
+  }
+}
+</script>
 
 </body>
 </html>

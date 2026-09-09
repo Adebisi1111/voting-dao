@@ -54,6 +54,25 @@
 
     .spacer { flex: 1; }
 
+    .wallet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .wallet-btn:hover { background: #6BA0FF; }
+    .wallet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .wallet-btn.connected { background: #10b981; }
+
     @media (max-width: 700px) {
       .nav-links { display: none; }
     }
@@ -81,32 +100,33 @@
       font-size: 1rem;
     }
 
-    /* Info Banner */
-    .info-banner {
-      background: rgba(79, 140, 255, 0.08);
-      border: 1px solid rgba(79, 140, 255, 0.25);
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 25px;
+    .wallet-status {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
     }
 
-    .info-banner__icon {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+    .wallet-address {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.875rem;
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--hairline);
+      padding: 0.5rem 1rem;
     }
 
-    .info-banner__text {
-      color: #b8d4f8;
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
-
-    .info-banner__text strong {
-      color: #7eb6ee;
+    .network-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.5rem 1rem;
     }
 
     /* Stats */
@@ -251,6 +271,8 @@
     .vote-btn.yes:hover { border-color: #4ade80; color: #4ade80; }
     .vote-btn.no:hover { border-color: #f87171; color: #f87171; }
 
+    .vote-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* Create Proposal Form */
     .create-proposal {
       background: #111111;
@@ -306,32 +328,34 @@
     }
 
     .submit-btn:hover { background: #6BA0FF; }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1a1a1a;
-      border: 1px solid var(--hairline);
-      padding: 14px 20px;
-      font-size: 0.85rem;
-      color: #fff;
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.3s ease;
-      max-width: 90%;
+    /* Output */
+    .output {
+      background: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.75rem;
+      color: #4ade80;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .output.show { display: block; }
+    .output.error { color: #f87171; }
+
+    /* Loading */
+    .loading {
       text-align: center;
+      padding: 2rem;
+      color: var(--muted);
     }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success { border-color: #4ade80; }
-    .toast.error { border-color: #f87171; }
 
     /* Footer */
     footer { border-top: 1px solid var(--hairline); padding: 1.5rem; text-align: center; font-size: 0.7rem; color: var(--muted); }
@@ -353,103 +377,49 @@
   </div>
 
   <div class="spacer"></div>
+
+  <button id="walletBtn" class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
 </nav>
 
 <main class="main">
   <div class="page-header">
     <h1>VotingDAO</h1>
     <p>Decentralized Governance on GenLayer</p>
-  </div>
-
-  <div class="info-banner">
-    <svg class="info-banner__icon" viewBox="0 0 24 24" fill="none" stroke="#7eb6ee" stroke-width="2">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M12 16v-4M12 8h.01"/>
-    </svg>
-    <span class="info-banner__text">
-      <strong>No wallet needed.</strong> Transactions are relayed through our backend — no gas fees, no wallet connection required.
-    </span>
+    <div class="wallet-status" id="walletStatus" style="display:none;">
+      <span class="wallet-address" id="walletAddress"></span>
+      <span class="network-badge">GenLayer Bradbury</span>
+    </div>
   </div>
 
   <div class="stats">
     <div class="stat-card">
-      <div class="stat-value">12</div>
+      <div class="stat-value" id="statProposals">—</div>
       <div class="stat-label">Total Proposals</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">3</div>
+      <div class="stat-value" id="statActive">—</div>
       <div class="stat-label">Active</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">1,247</div>
-      <div class="stat-label">Total Votes</div>
+      <div class="stat-value" id="statVoters">—</div>
+      <div class="stat-label">Your Votes</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">89</div>
-      <div class="stat-label">Voters</div>
+      <div class="stat-value" id="statRegistered">—</div>
+      <div class="stat-label">Registered</div>
     </div>
   </div>
 
-  <h2 class="section-title">Active Proposals</h2>
-
-  <div class="proposal-card">
-    <div class="proposal-header">
-      <span class="proposal-id">#prop-001</span>
-      <span class="proposal-status status-active">Active</span>
-    </div>
-    <h3 class="proposal-title">Allocate 10% of Treasury to Liquidity Mining</h3>
-    <p class="proposal-desc">Proposal to allocate 10% of the protocol treasury to liquidity mining rewards for the next quarter.</p>
-    <div class="proposal-meta">
-      <span>📅 Ends Oct 15, 2026</span>
-      <span>🗳️ 847 votes</span>
-    </div>
-    <div class="vote-bar"><div class="vote-yes" style="width:65%"></div><div class="vote-no" style="width:35%"></div></div>
-    <div class="vote-numbers"><span class="vote-yes-text">Yes: 550 (65%)</span><span class="vote-no-text">No: 297 (35%)</span></div>
-    <div class="proposal-actions">
-      <button class="vote-btn yes" onclick="castVote('prop-001','yes')">Vote Yes</button>
-      <button class="vote-btn no" onclick="castVote('prop-001','no')">Vote No</button>
-    </div>
-  </div>
-
-  <div class="proposal-card">
-    <div class="proposal-header">
-      <span class="proposal-id">#prop-002</span>
-      <span class="proposal-status status-active">Active</span>
-    </div>
-    <h3 class="proposal-title">Reduce Proposal Threshold to 100 Tokens</h3>
-    <p class="proposal-desc">Lower the minimum token requirement for creating proposals from 500 to 100 tokens.</p>
-    <div class="proposal-meta">
-      <span>📅 Ends Oct 12, 2026</span>
-      <span>🗳️ 623 votes</span>
-    </div>
-    <div class="vote-bar"><div class="vote-yes" style="width:73%"></div><div class="vote-no" style="width:27%"></div></div>
-    <div class="vote-numbers"><span class="vote-yes-text">Yes: 455 (73%)</span><span class="vote-no-text">No: 168 (27%)</span></div>
-    <div class="proposal-actions">
-      <button class="vote-btn yes" onclick="castVote('prop-002','yes')">Vote Yes</button>
-      <button class="vote-btn no" onclick="castVote('prop-002','no')">Vote No</button>
-    </div>
-  </div>
-
-  <div class="proposal-card">
-    <div class="proposal-header">
-      <span class="proposal-id">#prop-003</span>
-      <span class="proposal-status status-passed">Passed</span>
-    </div>
-    <h3 class="proposal-title">Extend Voting Period to 7 Days</h3>
-    <p class="proposal-desc">Increase the voting period from 3 days to 7 days for treasury decisions.</p>
-    <div class="proposal-meta">
-      <span>📅 Ended Oct 1, 2026</span>
-      <span>🗳️ 1,124 votes</span>
-    </div>
-    <div class="vote-bar"><div class="vote-yes" style="width:82%"></div><div class="vote-no" style="width:18%"></div></div>
-    <div class="vote-numbers"><span class="vote-yes-text">Yes: 922 (82%)</span><span class="vote-no-text">No: 202 (18%)</span></div>
+  <h2 class="section-title">Proposals</h2>
+  <div id="proposalsList">
+    <div class="loading">Connect wallet to view proposals</div>
   </div>
 
   <div class="create-proposal">
     <h2>Create Proposal</h2>
     <div class="form-group">
       <label class="form-label">Proposal ID</label>
-      <input type="text" class="form-input" id="proposalId" placeholder="e.g., prop-004">
+      <input type="text" class="form-input" id="proposalId" placeholder="e.g., prop-001">
     </div>
     <div class="form-group">
       <label class="form-label">Title</label>
@@ -463,11 +433,10 @@
       <label class="form-label">Deadline (Unix timestamp)</label>
       <input type="number" class="form-input" id="proposalDeadline" placeholder="e.g., 1729000000">
     </div>
-    <button class="submit-btn" onclick="createProposal()">Create Proposal</button>
+    <button class="submit-btn" id="createBtn" onclick="createProposal()" disabled>Connect Wallet First</button>
+    <div id="createOutput" class="output"></div>
   </div>
 </main>
-
-<div class="toast" id="toast"></div>
 
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="leaderboard.html">Leaderboard</a></div>
@@ -475,27 +444,298 @@
   <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x20f8d6cB56f922C973b9A7D7479E9452A61217BE</div>
 </footer>
 
-<script>
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type + ' show';
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+<script type="module">
+import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
+
+const CONTRACT = '0x20f8d6cB56f922C973b9A7D7479E9452A61217BE';
+const BRADBURY_CHAIN_ID = '0x107D';
+
+let client = null;
+let account = null;
+
+window.connectWallet = connectWallet;
+window.createProposal = createProposal;
+window.castVote = castVote;
+window.registerVoter = registerVoter;
+
+function showOutput(id, msg, isError) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'output show' + (isError ? ' error' : '');
 }
 
-function createProposal() {
-  var id = document.getElementById('proposalId').value;
-  var title = document.getElementById('proposalTitle').value;
-  if (!id || !title) { showToast('Please fill all fields', 'error'); return; }
-  showToast('Proposal "' + title + '" created! Relayed to GenLayer.', 'success');
-  document.getElementById('proposalId').value = '';
-  document.getElementById('proposalTitle').value = '';
-  document.getElementById('proposalDesc').value = '';
-  document.getElementById('proposalDeadline').value = '';
+function detectWallet() {
+  if (typeof window === 'undefined') return null;
+  if (window.rabby) return window.rabby.provider || window.ethereum;
+  if (window.ethereum?.isRabby) return window.ethereum;
+  if (window.ethereum?.isMetaMask) return window.ethereum;
+  if (window.ethereum) return window.ethereum;
+  return null;
 }
 
-function castVote(id, vote) {
-  showToast('Vote "' + vote + '" cast on ' + id + '! Relayed to GenLayer.', 'success');
+async function connectWallet() {
+  const btn = document.getElementById('walletBtn');
+  btn.disabled = true;
+  btn.textContent = 'Connecting...';
+
+  try {
+    const provider = detectWallet();
+    if (!provider) {
+      alert('No wallet detected. Please install MetaMask or Rabby.');
+      btn.disabled = false;
+      btn.textContent = 'Connect Wallet';
+      return;
+    }
+
+    const currentChainId = await provider.request({ method: 'eth_chainId' });
+    if (currentChainId !== BRADBURY_CHAIN_ID) {
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BRADBURY_CHAIN_ID }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BRADBURY_CHAIN_ID,
+              chainName: 'GenLayer Bradbury Testnet',
+              rpcUrls: ['https://rpc-bradbury.genlayer.com'],
+              nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
+              blockExplorerUrls: ['https://explorer-bradbury.genlayer.com'],
+            }],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) {
+      alert('No accounts found. Please unlock your wallet.');
+      btn.disabled = false;
+      btn.textContent = 'Connect Wallet';
+      return;
+    }
+
+    account = accounts[0];
+    client = createClient({ chain: chains.testnetBradbury, account });
+
+    btn.textContent = account.slice(0, 6) + '...' + account.slice(-4);
+    btn.classList.add('connected');
+    btn.disabled = false;
+
+    document.getElementById('walletStatus').style.display = 'flex';
+    document.getElementById('walletAddress').textContent = account.slice(0, 6) + '...' + account.slice(-4);
+
+    document.getElementById('createBtn').disabled = false;
+    document.getElementById('createBtn').textContent = 'Create Proposal →';
+
+    await loadProposals();
+    await loadStats();
+
+  } catch (err) {
+    console.error('Connection failed:', err);
+    alert('Connection failed: ' + (err.message || 'Unknown error'));
+    btn.disabled = false;
+    btn.textContent = 'Connect Wallet';
+  }
+}
+
+async function loadStats() {
+  try {
+    const count = await client.readContract({
+      address: CONTRACT,
+      functionName: 'get_proposals_count',
+      args: [],
+    });
+    document.getElementById('statProposals').textContent = count;
+
+    if (account) {
+      const registered = await client.readContract({
+        address: CONTRACT,
+        functionName: 'is_voter',
+        args: [account],
+      });
+      document.getElementById('statRegistered').textContent = registered === 'true' ? 'Yes' : 'No';
+    }
+  } catch (err) {
+    console.error('Failed to load stats:', err);
+  }
+}
+
+async function loadProposals() {
+  const list = document.getElementById('proposalsList');
+  list.innerHTML = '<div class="loading">Loading proposals...</div>';
+
+  try {
+    const count = await client.readContract({
+      address: CONTRACT,
+      functionName: 'get_proposals_count',
+      args: [],
+    });
+
+    document.getElementById('statProposals').textContent = count;
+
+    if (parseInt(count) === 0) {
+      list.innerHTML = '<div class="loading">No proposals yet. Create the first one!</div>';
+      return;
+    }
+
+    let proposals = [];
+    for (let i = 0; i < parseInt(count); i++) {
+      try {
+        const proposal = await client.readContract({
+          address: CONTRACT,
+          functionName: 'get_proposal',
+          args: ['prop-00' + (i + 1)],
+        });
+        const p = JSON.parse(proposal);
+        if (p.exists) proposals.push(p);
+      } catch (e) {
+        // Skip missing proposals
+      }
+    }
+
+    if (proposals.length === 0) {
+      list.innerHTML = '<div class="loading">No proposals found on-chain</div>';
+      return;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    let html = '';
+    proposals.forEach(p => {
+      const total = p.yes_votes + p.no_votes;
+      const yesPct = total > 0 ? Math.round(p.yes_votes / total * 100) : 0;
+      const noPct = total > 0 ? Math.round(p.no_votes / total * 100) : 0;
+      const isActive = !p.resolved && now < p.deadline;
+      const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : 'status-active';
+      const statusText = p.resolved ? p.result : 'ACTIVE';
+
+      html += '<div class="proposal-card">' +
+        '<div class="proposal-header">' +
+          '<span class="proposal-id">#' + p.proposal_id + '</span>' +
+          '<span class="proposal-status ' + statusClass + '">' + statusText + '</span>' +
+        '</div>' +
+        '<h3 class="proposal-title">' + p.title + '</h3>' +
+        '<p class="proposal-desc">' + (p.description || 'No description') + '</p>' +
+        '<div class="proposal-meta">' +
+          '<span>📅 ' + new Date(p.deadline * 1000).toLocaleDateString() + '</span>' +
+          '<span>🗳️ ' + total + ' votes</span>' +
+        '</div>' +
+        '<div class="vote-bar"><div class="vote-yes" style="width:' + yesPct + '%"></div><div class="vote-no" style="width:' + noPct + '%"></div></div>' +
+        '<div class="vote-numbers"><span class="vote-yes-text">Yes: ' + p.yes_votes + ' (' + yesPct + '%)</span><span class="vote-no-text">No: ' + p.no_votes + ' (' + noPct + '%)</span></div>' +
+        (isActive ? '<div class="proposal-actions">' +
+          '<button class="vote-btn yes" onclick="castVote(\'' + p.proposal_id + '\',\'yes\')">Vote Yes</button>' +
+          '<button class="vote-btn no" onclick="castVote(\'' + p.proposal_id + '\',\'no\')">Vote No</button>' +
+        '</div>' : '') +
+      '</div>';
+    });
+    list.innerHTML = html;
+
+  } catch (err) {
+    list.innerHTML = '<div class="loading">Error loading proposals: ' + err.message + '</div>';
+  }
+}
+
+async function withRetry(fn, maxAttempts = 5) {
+  let attempt = 0;
+  let delay = 4000;
+  while (attempt < maxAttempts) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = e?.error?.message ?? e?.message ?? '';
+      if (msg.includes('-32005') || msg.includes('rate limit') || msg.includes('empty')) {
+        console.warn(`Retry ${attempt + 1}/${maxAttempts} after ${delay}ms`);
+        await new Promise(r => setTimeout(r, delay));
+        delay *= 2;
+        attempt++;
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+async function registerVoter() {
+  if (!client) { alert('Connect wallet first'); return; }
+  try {
+    showOutput('createOutput', 'Registering...', false);
+    const result = await withRetry(async () => {
+      return await client.writeContract({
+        address: CONTRACT,
+        functionName: 'register_voter',
+        args: [],
+        value: 100000000000000000n, // 0.1 GEN
+      });
+    });
+    showOutput('createOutput', `Registered successfully!\nTx: ${result.transactionHash}`, false);
+    await loadStats();
+  } catch (err) {
+    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
+  }
+}
+
+async function createProposal() {
+  const id = document.getElementById('proposalId').value;
+  const title = document.getElementById('proposalTitle').value;
+  const desc = document.getElementById('proposalDesc').value;
+  const deadline = document.getElementById('proposalDeadline').value;
+
+  if (!id || !title || !deadline) {
+    showOutput('createOutput', 'Error: Please fill all fields', true);
+    return;
+  }
+
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  try {
+    const result = await withRetry(async () => {
+      return await client.writeContract({
+        address: CONTRACT,
+        functionName: 'create_proposal',
+        args: [id, title, desc, parseInt(deadline)],
+        value: 0n,
+      });
+    });
+
+    showOutput('createOutput', `Proposal created successfully!\nTx: ${result.transactionHash}`, false);
+    document.getElementById('proposalId').value = '';
+    document.getElementById('proposalTitle').value = '';
+    document.getElementById('proposalDesc').value = '';
+    document.getElementById('proposalDeadline').value = '';
+    await loadProposals();
+    await loadStats();
+  } catch (err) {
+    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Proposal →';
+  }
+}
+
+async function castVote(proposalId, vote) {
+  if (!client) { alert('Connect wallet first'); return; }
+  try {
+    showOutput('createOutput', 'Casting vote...', false);
+    const result = await withRetry(async () => {
+      return await client.writeContract({
+        address: CONTRACT,
+        functionName: 'cast_vote',
+        args: [proposalId, vote],
+        value: 0n,
+      });
+    });
+    showOutput('createOutput', `Vote "${vote}" cast on ${proposalId}!\nTx: ${result.transactionHash}`, false);
+    await loadProposals();
+  } catch (err) {
+    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
+  }
 }
 </script>
 
