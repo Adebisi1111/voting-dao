@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VotingDAO — Decentralized Governance</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg transform='rotate(-30 12 12)'%3E%3Ccircle cx='7.3' cy='3.2' r='1.45'/%3E%3Crect x='5.5' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Crect x='14.9' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Ccircle cx='16.7' cy='20.8' r='1.45'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --accent: #4F8CFF;
+      --accent-hover: #6BA0FF;
+      --accent-border: #3B6FD9;
+      --bg: #F2F1F0;
+      --bg-alt: #F7F6F8;
+      --heading: #2b3033;
+      --nav: #3a3a3a;
+      --body: #6b6f72;
+      --dark: #1a1c1e;
+      --card-bg: rgba(255,255,255,0.03);
+      --card-border: rgba(255,255,255,0.06);
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-alt: #141414;
+      --heading: #ffffff;
+      --nav: #a0a0a0;
+      --body: #888888;
+      --dark: #0a0a0a;
+      --card-bg: rgba(255,255,255,0.05);
+      --card-border: rgba(255,255,255,0.1);
+    }
+    
+    body {
+      font-family: 'Quantico', 'Arial Narrow', sans-serif;
+      background: var(--bg);
+      color: var(--body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    a { color: var(--nav); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent); }
+    
+    .chamfer { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
+    .chamfer-sm { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+    
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      background: var(--bg);
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    
+    /* Hero Visual */
+    .hero-visual {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .hero-graphic {
+      position: relative;
+      width: 600px;
+      height: 600px;
+      margin-right: -10%;
+    }
+    
+    .node {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(79, 140, 255, 0.15);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .node::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent);
+    }
+    
+    .node-1 { top: 20%; left: 20%; animation-delay: 0s; }
+    .node-2 { top: 50%; right: 20%; animation-delay: 2s; }
+    .node-3 { bottom: 20%; left: 40%; animation-delay: 4s; }
+    
+    .connection {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.5;
+      animation: pulse-line 3s ease-in-out infinite;
+    }
+    
+    .conn-1 {
+      top: 35%;
+      left: 25%;
+      width: 200px;
+      transform: rotate(30deg);
+    }
+    
+    .conn-2 {
+      top: 55%;
+      left: 30%;
+      width: 180px;
+      transform: rotate(-20deg);
+      animation-delay: 1.5s;
+    }
+    
+    .pulse {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 1px solid rgba(79, 140, 255, 0.3);
+      transform: translate(-50%, -50%);
+      animation: ripple 4s ease-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes pulse-line {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+    
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+    }
+    
+    @media (max-width: 700px) {
+      .hero-graphic {
+        width: 300px;
+        height: 300px;
+        margin-right: -30%;
+        opacity: 0.5;
+      }
+    }
+    
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    @media (min-width: 701px) {
+      .hero-scrim {
+        background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 55%, rgba(242,241,240,0.85) 78%, rgba(242,241,240,0) 100%);
+      }
+    }
+    
+    [data-theme="dark"] .hero-scrim {
+      background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 55%, rgba(10,10,10,0.85) 78%, rgba(10,10,10,0) 100%) !important;
+    }
+    
+    /* Navbar */
+    .navbar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: clamp(20px, 5vw, 56px);
+      padding: clamp(20px, 3vw, 38px) clamp(20px, 4vw, 48px) 0;
+    }
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    
+    .nav-logo-text {
+      font-size: clamp(22px, 5vw, 30px);
+      font-weight: 700;
+      color: var(--heading);
+      letter-spacing: -0.5px;
+      text-transform: lowercase;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 34px;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      font-weight: 700;
+      font-size: clamp(12px, 2.4vw, 15px);
+      letter-spacing: 0.06em;
+      color: var(--nav);
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    
+    [data-theme="dark"] .nav-links a { color: #e0e0e0; }
+    [data-theme="dark"] .nav-links a:hover { color: var(--accent); }
+    
+    .theme-toggle {
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--nav);
+      transition: color 0.2s;
+    }
+    
+    .theme-toggle:hover { color: var(--accent); }
+    .theme-icon-light { width: 20px; height: 20px; display: block; }
+    .theme-icon-dark { width: 20px; height: 20px; display: none; }
+    [data-theme="dark"] .theme-icon-light { display: none; }
+    [data-theme="dark"] .theme-icon-dark { display: block; }
+    
+    .nav-cta {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      border: 1px solid var(--accent-border);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: clamp(12px, 2.4vw, 15px);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 14px 26px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.35), 0 10px 30px -12px rgba(59, 111, 217, 0.6);
+    }
+    
+    .nav-cta:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 1px rgba(107, 160, 255, 0.5), 0 14px 36px -10px rgba(59, 111, 217, 0.8);
+    }
+    
+    .hamburger {
+      display: none;
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    
+    .hamburger-bar {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--heading);
+      margin: 5px 0;
+    }
+    
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--dark);
+      padding: 20px;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 100;
+    }
+    
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: #fff; font-weight: 700; text-transform: uppercase; font-size: 14px; }
+    
+    @media (max-width: 700px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: block; }
+    }
+    
+    /* Headline */
+    .hero-content {
+      position: relative;
+      z-index: 5;
+    }
+    
+    .hero h1 {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 0.98;
+      color: var(--heading);
+    }
+    
+    .hero-line { display: block; }
+    .hero-line.indented { text-indent: min(238px, 28vw); }
+    .hero-line.accent { color: var(--accent); }
+    
+    @media (min-width: 701px) {
+      .hero-content {
+        padding: min(clamp(40px, 9vw, 120px), 9vh) 20px min(clamp(24px, 4vw, 44px), 5vh) clamp(20px, 9vw, 118px);
+      }
+      .hero h1 { font-size: min(clamp(34px, 7.6vw, 80px), 9.2vh); }
+    }
+    
+    @media (max-width: 700px) {
+      .hero-content { margin-top: 360px; padding: 0 20px 28px 20px; }
+      .hero h1 { font-size: clamp(34px, 10vw, 56px); }
+      .hero-line.indented { text-indent: 0; }
+    }
+    
+    /* CTA Button */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--accent);
+      border: 1px solid var(--accent-border);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: clamp(13px, 2.2vw, 16px);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 18px 34px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.35), 0 10px 30px -12px rgba(59, 111, 217, 0.6);
+    }
+    
+    .cta-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 1px rgba(107, 160, 255, 0.5), 0 14px 36px -10px rgba(59, 111, 217, 0.8);
+    }
+    
+    .cta-btn::after {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: #fff;
+    }
+    
+    .hero-cta { display: inline-block; }
+    
+    @media (min-width: 701px) {
+      .hero-cta {
+        padding-left: calc(clamp(20px, 9vw, 118px) + min(238px, 28vw));
+        padding-bottom: min(clamp(36px, 6vw, 80px), 7vh);
+      }
+    }
+    
+    @media (max-width: 700px) {
+      .hero-cta { margin-top: 24px; }
+    }
+    
+    /* About */
+    .about {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 40px;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 18%, var(--bg-alt) 100%);
+      padding: clamp(60px, 10vw, 140px) 0 clamp(30px, 5vw, 70px) clamp(20px, 9vw, 118px);
+      transition: background 0.3s;
+    }
+    
+    .about-left { flex: 1 1 420px; min-width: 300px; }
+    .about-right { flex: 1 1 360px; min-width: 280px; display: flex; justify-content: flex-end; position: relative; }
+    
+    .about h2 {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 0.98;
+      color: var(--heading);
+      font-size: clamp(34px, 6.5vw, 72px);
+    }
+    
+    .about-h2-line { display: block; }
+    .about-h2-line.indented { text-indent: min(160px, 18vw); color: var(--accent); }
+    
+    .about-text {
+      max-width: 520px;
+      margin: 32px 0 0 min(160px, 18vw);
+      font-size: clamp(14px, 1.6vw, 17px);
+      line-height: 1.7;
+      color: var(--body);
+    }
+    
+    .about-cta { margin: 36px 0 0 min(160px, 18vw); }
+    
+    .about-visual {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 400px;
+    }
+    
+    .about-graphic {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .about-node {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background: rgba(79, 140, 255, 0.1);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: float 5s ease-in-out infinite;
+    }
+    
+    .about-node::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      background: var(--accent);
+    }
+    
+    .an-1 { top: 10%; left: 10%; animation-delay: 0s; }
+    .an-2 { top: 30%; right: 10%; animation-delay: 1s; }
+    .an-3 { bottom: 30%; left: 20%; animation-delay: 2s; }
+    .an-4 { bottom: 10%; right: 20%; animation-delay: 3s; }
+    
+    .about-connection {
+      position: absolute;
+      background: var(--accent);
+      opacity: 0.3;
+    }
+    
+    .ac-1 {
+      top: 25%;
+      left: 15%;
+      width: 120px;
+      height: 2px;
+      transform: rotate(45deg);
+    }
+    
+    .ac-2 {
+      top: 50%;
+      left: 25%;
+      width: 100px;
+      height: 2px;
+      transform: rotate(-30deg);
+    }
+    
+    .ac-3 {
+      bottom: 25%;
+      left: 30%;
+      width: 80px;
+      height: 2px;
+      transform: rotate(20deg);
+    }
+    
+    @media (max-width: 700px) {
+      .about { padding: 60px 20px 40px 20px; }
+      .about-text, .about-cta { margin-left: 0; }
+      .about-h2-line.indented { text-indent: 0; }
+    }
+    
+    /* How It Works */
+    .how-it-works {
+      background: var(--bg);
+      padding: clamp(60px, 10vw, 140px) clamp(20px, 9vw, 118px);
+      transition: background 0.3s;
+    }
+    
+    .how-it-works h2 {
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 0.98;
+      color: var(--heading);
+      font-size: clamp(34px, 6.5vw, 72px);
+      margin-bottom: 3rem;
+    }
+    
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .step {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    
+    [data-theme="dark"] .step { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    
+    .step-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(79, 140, 255, 0.15);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .step h3 {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--heading);
+      margin-bottom: 0.5rem;
+    }
+    
+    .step p {
+      font-size: 0.9rem;
+      color: var(--body);
+    }
+    
+    /* Why */
+    .why {
+      background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+      padding: clamp(60px, 10vw, 140px) clamp(20px, 9vw, 118px);
+      transition: background 0.3s;
+    }
+    
+    .why h2 {
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 0.98;
+      color: var(--heading);
+      font-size: clamp(34px, 6.5vw, 72px);
+      margin-bottom: 3rem;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .feature {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+    
+    [data-theme="dark"] .feature { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature h3 {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--heading);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    
+    .feature p {
+      font-size: 0.85rem;
+      color: var(--body);
+    }
+    
+    /* Footer */
+    footer { border-top: 1px solid rgba(0,0,0,0.08); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--body); transition: border-color 0.3s; }
+    [data-theme="dark"] footer { border-top-color: rgba(255,255,255,0.08); }
+    footer a { color: var(--body); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-visual">
+    <div class="hero-graphic">
+      <div class="node node-1"></div>
+      <div class="node node-2"></div>
+      <div class="node node-3"></div>
+      <div class="connection conn-1"></div>
+      <div class="connection conn-2"></div>
+      <div class="pulse"></div>
+    </div>
+  </div>
+  
+  <div class="hero-scrim"></div>
+  
+  <nav class="navbar">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-text">votingdao<span style="font-weight:400;color:rgba(255,255,255,0.5)">.io</span></span>
+    </a>
+    
+    <div class="nav-links">
+      <a href="#about">ABOUT</a>
+      <a href="#how-it-works">HOW IT WORKS</a>
+      <a href="#why">WHY</a>
+    </div>
+    
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    
+    <a href="app.html" class="nav-cta">Launch App</a>
+    
+    <button class="hamburger" aria-label="Menu">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+    
+    <div class="mobile-menu">
+      <a href="#about">ABOUT</a>
+      <a href="#how-it-works">HOW IT WORKS</a>
+      <a href="#why">WHY</a>
+      <a href="app.html">LAUNCH APP</a>
+    </div>
+  </nav>
+  
+  <div class="hero-content">
+    <h1>
+      <span class="hero-line">Decentralized</span>
+      <span class="hero-line indented">Governance</span>
+      <span class="hero-line accent">for DAOs</span>
+    </h1>
+    
+    <div class="hero-cta">
+      <a href="app.html" class="cta-btn">Launch App</a>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="about-left">
+    <h2>
+      <span class="about-h2-line">Vote with</span>
+      <span class="about-h2-line indented">Confidence</span>
+    </h2>
+    <p class="about-text">
+      VotingDAO is a gasless governance platform built on GenLayer. Create proposals, cast votes, and let AI consensus tally the results — all without paying gas fees. Transparent, immutable, and fair.
+    </p>
+    <div class="about-cta">
+      <a href="app.html" class="cta-btn">Get Started</a>
+    </div>
+  </div>
+  
+  <div class="about-right">
+    <div class="about-visual">
+      <div class="about-graphic">
+        <div class="about-node an-1"></div>
+        <div class="about-node an-2"></div>
+        <div class="about-node an-3"></div>
+        <div class="about-node an-4"></div>
+        <div class="about-connection ac-1"></div>
+        <div class="about-connection ac-2"></div>
+        <div class="about-connection ac-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works" id="how-it-works">
+  <h2>How It Works</h2>
+  
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">📝</div>
+      <h3>Create Proposal</h3>
+      <p>Submit a proposal with title, description, and deadline. Anyone can create.</p>
+    </div>
+    
+    <div class="step">
+      <div class="step-icon">🗳️</div>
+      <h3>Cast Votes</h3>
+      <p>Register and vote yes or no. One address, one vote per proposal.</p>
+    </div>
+    
+    <div class="step">
+      <div class="step-icon">🤖</div>
+      <h3>AI Consensus</h3>
+      <p>Validators verify the final result. No manipulation possible.</p>
+    </div>
+    
+    <div class="step">
+      <div class="step-icon">✅</div>
+      <h3>Finalize</h3>
+      <p>Results are permanent and verifiable on-chain. No disputes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <h2>Why VotingDAO</h2>
+  
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">⛽</div>
+      <h3>Gasless</h3>
+      <p>No gas fees for voting. Backend relay handles transactions.</p>
+    </div>
+    
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure</h3>
+      <p>One address, one vote. Double-voting impossible.</p>
+    </div>
+    
+    <div class="feature">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Verified</h3>
+      <p>Consensus ensures all validators agree on the final result.</p>
+    </div>
+    
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <h3>Transparent</h3>
+      <p>All votes and results verifiable on GenLayer Bradbury.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="app.html">App</a> · <a href="#about">About</a></div>
+  <div>© 2026 VotingDAO — Built on GenLayer</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x20f8d6cB56f922C973b9A7D7479E9452A61217BE</div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+}
+</script>
+
+</body>
+</html>
