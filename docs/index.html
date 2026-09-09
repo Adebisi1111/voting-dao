@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GenLayer Voting DAO</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);min-height:100vh;color:#fff;line-height:1.5}
+    header{border-bottom:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(12px);background:rgba(255,255,255,0.05);position:sticky;top:0;z-index:50}
+    .header-inner{max-width:1200px;margin:0 auto;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+    .logo{display:flex;align-items:center;gap:0.75rem}
+    .logo-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#10b981);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;box-shadow:0 4px 12px rgba(59,130,246,0.3)}
+    .logo h1{font-size:1.2rem;font-weight:700}
+    .logo span{font-size:0.7rem;color:rgba(255,255,255,0.5)}
+    .btn{padding:0.5rem 1rem;border-radius:8px;font-weight:500;font-size:0.875rem;cursor:pointer;transition:all 0.2s;border:none;display:inline-flex;align-items:center;gap:0.5rem}
+    .btn-primary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)}
+    .btn-primary:hover{background:rgba(255,255,255,0.2)}
+    .btn-gradient{background:linear-gradient(135deg,#3b82f6,#10b981);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.3)}
+    .btn-gradient:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(59,130,246,0.4)}
+    .btn-gradient:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .container{max-width:1200px;margin:0 auto;padding:2rem}
+    .hero{text-align:center;padding:3rem 0}
+    .hero h2{font-size:2.5rem;font-weight:800;letter-spacing:-0.03em;line-height:1.1;margin-bottom:1rem}
+    .hero p{color:rgba(255,255,255,0.6);font-size:1.125rem;max-width:600px;margin:0 auto}
+    .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem}
+    .card-title{font-size:1rem;font-weight:600;margin-bottom:1rem}
+    .input{width:100%;padding:0.75rem 1rem;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:0.875rem;margin-bottom:0.75rem;transition:all 0.2s;font-family:inherit}
+    .input::placeholder{color:rgba(255,255,255,0.3)}
+    .input:focus{outline:none;border-color:#3b82f6;background:rgba(255,255,255,0.08)}
+    textarea.input{resize:none}
+    .proposals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
+    .proposal-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.25rem;transition:all 0.2s;display:flex;flex-direction:column}
+    .proposal-card:hover{background:rgba(255,255,255,0.08)}
+    .proposal-top{display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem}
+    .proposal-id{font-size:0.7rem;color:rgba(255,255,255,0.4);font-family:monospace}
+    .verdict{padding:0.2rem 0.5rem;border-radius:9999px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+    .verdict-pass{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.2)}
+    .verdict-fail{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+    .verdict-inconclusive{background:rgba(234,179,8,0.15);color:#facc15;border:1px solid rgba(234,179,8,0.2)}
+    .proposal-text{font-weight:500;font-size:0.875rem;margin-bottom:0.75rem}
+    .vote-bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.1);margin-bottom:0.75rem;overflow:hidden;display:flex}
+    .vote-yes{height:100%;background:#4ade80}
+    .vote-no{height:100%;background:#f87171}
+    .vote-numbers{display:flex;justify-content:space-between;font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:0.75rem}
+    .vote-btns{display:flex;gap:0.5rem}
+    .vote-btn{flex:1;padding:0.5rem;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff}
+    .vote-btn:hover{background:rgba(255,255,255,0.1)}
+    .vote-btn.yes:hover{border-color:#4ade80;color:#4ade80}
+    .vote-btn.no:hover{border-color:#f87171;color:#f87171}
+    .empty{grid-column:1/-1;text-align:center;padding:3rem;color:rgba(255,255,255,0.4)}
+    .error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:0.75rem;margin-bottom:1rem;color:#f87171;font-size:0.875rem;display:none}
+    footer{border-top:1px solid rgba(255,255,255,0.05);margin-top:3rem;padding:1.5rem 0;text-align:center;color:rgba(255,255,255,0.3);font-size:0.75rem}
+    @media(max-width:768px){.proposals-grid{grid-template-columns:1fr}.hero h2{font-size:1.75rem}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">V</div>
+      <div><h1>Voting DAO</h1><div>GenLayer Governance</div></div>
+    </div>
+    <button class="btn btn-gradient" onclick="showRegister()">Register to Vote</button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <h2>Decentralized Voting</h2>
+    <p>Create proposals, cast votes, and let AI consensus tally the results.</p>
+  </div>
+
+  <div id="errorBox" class="error"></div>
+
+  <div class="card">
+    <div class="card-title">Create Proposal</div>
+    <input type="text" id="proposalId" class="input" placeholder="Proposal ID (e.g., prop-1)">
+    <input type="text" id="proposalTitle" class="input" placeholder="Proposal Title">
+    <textarea id="proposalDesc" class="input" rows="2" placeholder="Description"></textarea>
+    <input type="number" id="proposalDeadline" class="input" placeholder="Deadline (Unix timestamp)">
+    <button class="btn btn-gradient" style="width:100%;padding:0.75rem" onclick="createProposal()">Create Proposal</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Proposals</div>
+    <div id="proposalsList" class="proposals-grid">
+      <div class="empty">No proposals yet. Create the first one above!</div>
+    </div>
+  </div>
+</main>
+
+<footer>Voting DAO — Built on GenLayer</footer>
+
+<script>
+const API = window.location.origin;
+
+function showError(msg){var e=document.getElementById('errorBox');e.textContent=msg;e.style.display='block';setTimeout(function(){e.style.display='none'},5000)}
+
+async function createProposal(){
+  var id=document.getElementById('proposalId').value;
+  var title=document.getElementById('proposalTitle').value;
+  var desc=document.getElementById('proposalDesc').value;
+  var deadline=document.getElementById('proposalDeadline').value;
+  if(!id||!title||!deadline){showError('Please fill all fields');return}
+  try{
+    var res=await fetch(API+'/create-proposal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal_id:id,title:title,description:desc,deadline:parseInt(deadline)})});
+    var data=await res.json();
+    if(data.success){
+      document.getElementById('proposalId').value='';
+      document.getElementById('proposalTitle').value='';
+      document.getElementById('proposalDesc').value='';
+      document.getElementById('proposalDeadline').value='';
+      loadProposals();
+    }else{
+      showError(data.error||'Failed to create proposal');
+    }
+  }catch(e){
+    showError('Error: '+e.message);
+  }
+}
+
+async function castVote(id, vote){
+  try{
+    var res=await fetch(API+'/cast-vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal_id:id,vote:vote})});
+    var data=await res.json();
+    if(data.success){
+      loadProposals();
+    }else{
+      showError(data.error||'Failed to vote');
+    }
+  }catch(e){
+    showError('Error: '+e.message);
+  }
+}
+
+async function resolveProposal(id){
+  try{
+    var res=await fetch(API+'/resolve-proposal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal_id:id})});
+    var data=await res.json();
+    if(data.success){
+      loadProposals();
+    }else{
+      showError(data.error||'Failed to resolve');
+    }
+  }catch(e){
+    showError('Error: '+e.message);
+  }
+}
+
+async function loadProposals(){
+  try{
+    var res=await fetch(API+'/proposals');
+    var data=await res.json();
+    var list=document.getElementById('proposalsList');
+    if(data.proposals.length===0){
+      list.innerHTML='<div class="empty">No proposals yet. Create the first one above!</div>';
+      return;
+    }
+    list.innerHTML=data.proposals.map(function(p){
+      var total=p.yes_votes+p.no_votes;
+      var yesPct=total>0?Math.round(p.yes_votes/total*100):0;
+      var noPct=total>0?Math.round(p.no_votes/total*100):0;
+      return '<div class="proposal-card">' +
+        '<div class="proposal-top">' +
+          '<span class="proposal-id">#' + p.proposal_id + '</span>' +
+          (p.resolved ? '<span class="verdict verdict-' + p.result.toLowerCase() + '">' + p.result + '</span>' : '') +
+        '</div>' +
+        '<p class="proposal-text">' + p.title + '</p>' +
+        '<div class="vote-bar"><div class="vote-yes" style="width:' + yesPct + '%"></div><div class="vote-no" style="width:' + noPct + '%"></div></div>' +
+        '<div class="vote-numbers"><span>Yes: ' + p.yes_votes + ' (' + yesPct + '%)</span><span>No: ' + p.no_votes + ' (' + noPct + '%)</span></div>' +
+        '<div class="vote-btns">' +
+          '<button class="vote-btn yes" onclick="castVote(\'' + p.proposal_id + '\',\'yes\')">Vote Yes</button>' +
+          '<button class="vote-btn no" onclick="castVote(\'' + p.proposal_id + '\',\'no\')">Vote No</button>' +
+          (!p.resolved ? '<button class="vote-btn" onclick="resolveProposal(\'' + p.proposal_id + '\')">Resolve</button>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }catch(e){
+    showError('Error loading proposals: '+e.message);
+  }
+}
+
+loadProposals();
+</script>
+</body>
+</html>
