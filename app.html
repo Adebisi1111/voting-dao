@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VotingDAO — App</title>
+  <title>VotingDAO — Governance</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg transform='rotate(-30 12 12)'%3E%3Ccircle cx='7.3' cy='3.2' r='1.45'/%3E%3Crect x='5.5' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Crect x='14.9' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Ccircle cx='16.7' cy='20.8' r='1.45'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,41 +15,26 @@
       --accent: #4F8CFF;
       --accent-hover: #6BA0FF;
       --accent-border: #3B6FD9;
-      --bg: #F2F1F0;
-      --bg-alt: #F7F6F8;
-      --heading: #2b3033;
-      --nav: #3a3a3a;
-      --body: #6b6f72;
-      --dark: #1a1c1e;
-      --card-bg: rgba(255,255,255,0.03);
-      --card-border: rgba(255,255,255,0.06);
-    }
-    
-    [data-theme="dark"] {
-      --bg: #0a0a0a;
-      --bg-alt: #141414;
-      --heading: #ffffff;
-      --nav: #a0a0a0;
-      --body: #888888;
-      --dark: #0a0a0a;
-      --card-bg: rgba(255,255,255,0.05);
-      --card-border: rgba(255,255,255,0.1);
+      --bg: #0B0E14;
+      --bg-alt: #11151C;
+      --card: #151A23;
+      --card-hover: #1A2030;
+      --border: rgba(255,255,255,0.06);
+      --text: #FFFFFF;
+      --text-muted: #8892A4;
     }
     
     body {
       font-family: 'Quantico', 'Arial Narrow', sans-serif;
       background: var(--bg);
-      color: var(--body);
+      color: var(--text-muted);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
     }
     
-    a { color: var(--nav); text-decoration: none; transition: color 0.2s; }
+    a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
     a:hover { color: var(--accent); }
-    
-    .chamfer { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); }
     
     /* Navbar */
     .navbar {
@@ -57,53 +42,25 @@
       top: 0;
       z-index: 100;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       gap: clamp(20px, 5vw, 56px);
-      padding: clamp(20px, 3vw, 38px) clamp(20px, 4vw, 48px);
-      background: var(--bg);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      transition: background 0.3s;
+      padding: 1rem 2rem;
+      background: rgba(11,14,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
     }
     
-    [data-theme="dark"] .navbar { border-bottom-color: rgba(255,255,255,0.08); }
-    
     .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo-text { font-size: clamp(22px, 5vw, 30px); font-weight: 700; color: var(--heading); letter-spacing: -0.5px; text-transform: lowercase; }
+    .nav-logo-text { font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.5px; text-transform: lowercase; }
     
     .nav-links { display: flex; gap: 34px; align-items: center; }
-    .nav-links a { font-weight: 700; font-size: clamp(12px, 2.4vw, 15px); letter-spacing: 0.06em; color: var(--nav); white-space: nowrap; text-transform: uppercase; }
-    [data-theme="dark"] .nav-links a { color: #e0e0e0; }
-    [data-theme="dark"] .nav-links a:hover { color: var(--accent); }
+    .nav-links a { font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--accent); }
     
-    .theme-toggle { margin-left: auto; background: none; border: none; cursor: pointer; padding: 8px; color: var(--nav); transition: color 0.2s; }
+    .theme-toggle { margin-left: auto; background: none; border: none; cursor: pointer; padding: 8px; color: var(--text-muted); transition: color 0.2s; }
     .theme-toggle:hover { color: var(--accent); }
     .theme-icon-light { width: 20px; height: 20px; display: block; }
     .theme-icon-dark { width: 20px; height: 20px; display: none; }
-    [data-theme="dark"] .theme-icon-light { display: none; }
-    [data-theme="dark"] .theme-icon-dark { display: block; }
-    
-    .wallet-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent);
-      border: 1px solid var(--accent-border);
-      color: #fff;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: clamp(12px, 2.4vw, 15px);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 14px 26px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.35), 0 10px 30px -12px rgba(59, 111, 217, 0.6);
-    }
-    
-    .wallet-btn:hover { background: var(--accent-hover); }
-    .wallet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .wallet-btn.connected { background: #10b981; border-color: #059669; }
     
     @media (max-width: 700px) {
       .nav-links { display: none; }
@@ -117,39 +74,8 @@
     }
     
     .app-header { text-align: center; margin-bottom: 3rem; }
-    .app-header h1 { font-size: clamp(34px, 6.5vw, 72px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.98; color: var(--heading); }
-    .app-header p { color: var(--body); font-size: 1rem; margin-top: 1rem; }
-    
-    .wallet-status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .wallet-address {
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 0.875rem;
-      color: var(--heading);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-    }
-    
-    .network-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-    }
+    .app-header h1 { font-size: clamp(34px, 6.5vw, 72px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.98; color: var(--text); }
+    .app-header p { color: var(--text-muted); font-size: 1rem; margin-top: 1rem; }
     
     .app-grid {
       display: grid;
@@ -163,16 +89,16 @@
     }
     
     .demo-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 1.5rem;
       transition: background 0.3s, border 0.3s;
     }
     
-    [data-theme="dark"] .demo-card { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    .demo-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.1); }
     
-    .demo-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--heading); }
+    .demo-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
     
     .input {
       width: 100%;
@@ -180,18 +106,15 @@
       border-radius: 10px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      color: var(--heading);
+      color: var(--text);
       font-size: 0.875rem;
       margin-bottom: 0.75rem;
       transition: all 0.2s;
       font-family: inherit;
     }
     
-    .input::placeholder { color: rgba(43, 48, 51, 0.3); }
+    .input::placeholder { color: rgba(255,255,255,0.3); }
     .input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.08); }
-    [data-theme="dark"] .input { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-    [data-theme="dark"] .input::placeholder { color: rgba(255,255,255,0.4); }
-    [data-theme="dark"] .input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); }
     
     .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     @media (max-width: 500px) { .input-row { grid-template-columns: 1fr; } }
@@ -229,19 +152,17 @@
       margin-top: 1rem;
       font-family: 'SF Mono', Monaco, monospace;
       font-size: 0.75rem;
-      color: #1a1c1e;
+      color: #4ade80;
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 200px;
       overflow-y: auto;
       display: none;
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
     }
     
     .output.show { display: block; }
-    .output.error { color: #dc2626; }
-    [data-theme="dark"] .output { background: rgba(255,255,255,0.08); color: #4ade80; border-color: rgba(255,255,255,0.15); }
-    [data-theme="dark"] .output.error { color: #f87171; }
+    .output.error { color: #f87171; }
     
     .info-box {
       background: rgba(79, 140, 255, 0.05);
@@ -250,15 +171,14 @@
       padding: 1rem;
       margin-bottom: 1.5rem;
       font-size: 0.875rem;
-      color: var(--body);
+      color: var(--text-muted);
     }
     
     .info-box strong { color: var(--accent); }
     
     /* Footer */
-    footer { border-top: 1px solid rgba(0,0,0,0.08); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--body); transition: border-color 0.3s; }
-    [data-theme="dark"] footer { border-top-color: rgba(255,255,255,0.08); }
-    footer a { color: var(--body); text-decoration: none; }
+    footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+    footer a { color: var(--text-muted); text-decoration: none; }
     footer a:hover { color: var(--accent); }
   </style>
 </head>
@@ -284,23 +204,16 @@
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
     </svg>
   </button>
-  
-  <button id="walletBtn" class="wallet-btn chamfer-sm" onclick="connectWallet()">Connect Wallet</button>
 </nav>
 
 <section class="app-section">
   <div class="app-header">
-    <h1>VOTINGDAO APP</h1>
-    <p>Create proposals, cast votes, and verify — all on GenLayer Bradbury</p>
-    
-    <div class="wallet-status" id="walletStatus" style="display:none;">
-      <span class="wallet-address" id="walletAddress"></span>
-      <span class="network-badge">GenLayer Bradbury</span>
-    </div>
+    <h1>VOTINGDAO</h1>
+    <p>Create proposals, cast votes, and let AI consensus tally the results</p>
   </div>
   
-  <div class="info-box" id="infoBox">
-    <strong>Welcome to VotingDAO.</strong> Connect your wallet (MetaMask or Rabby) to GenLayer Bradbury Testnet to create proposals, cast votes, and view results. Make sure you have test GEN for gas.
+  <div class="info-box">
+    <strong>Welcome to VotingDAO.</strong> Fill the form below to create a proposal or cast a vote. Transactions are relayed through our backend — no wallet connection needed.
   </div>
   
   <div class="app-grid">
@@ -310,7 +223,7 @@
       <input type="text" id="proposalTitle" class="input" placeholder="Proposal Title">
       <textarea id="proposalDesc" class="input" rows="2" placeholder="Description"></textarea>
       <input type="number" id="proposalDeadline" class="input" placeholder="Deadline (Unix timestamp)">
-      <button class="demo-btn" id="createBtn" onclick="createProposal()" disabled>Connect Wallet First</button>
+      <button class="demo-btn" onclick="createProposal()">Create Proposal →</button>
       <div id="createOutput" class="output"></div>
     </div>
     
@@ -318,15 +231,15 @@
       <h3>🗳️ Cast Vote</h3>
       <input type="text" id="voteProposalId" class="input" placeholder="Proposal ID">
       <div class="input-row">
-        <button class="demo-btn" id="voteYesBtn" onclick="castVote('yes')" disabled>Connect Wallet First</button>
-        <button class="demo-btn demo-btn-outline" id="voteNoBtn" onclick="castVote('no')" disabled>Connect Wallet First</button>
+        <button class="demo-btn" onclick="castVote('yes')">Vote Yes</button>
+        <button class="demo-btn demo-btn-outline" onclick="castVote('no')">Vote No</button>
       </div>
       <div id="voteOutput" class="output"></div>
       
-      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.06);">
+      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
         <h3 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">🔍 View Proposal</h3>
         <input type="text" id="viewProposalId" class="input" placeholder="Proposal ID">
-        <button class="demo-btn demo-btn-outline" id="viewBtn" onclick="viewProposal()" disabled>Connect Wallet First</button>
+        <button class="demo-btn demo-btn-outline" onclick="viewProposal()">Fetch Proposal</button>
         <div id="viewOutput" class="output"></div>
       </div>
     </div>
@@ -339,128 +252,13 @@
   <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x20f8d6cB56f922C973b9A7D7479E9452A61217BE</div>
 </footer>
 
-<script type="module">
-import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
-
-const CONTRACT = '0x20f8d6cB56f922C973b9A7D7479E9452A61217BE';
-const BRADBURY_CHAIN_ID = '0x107D';
-
-let client = null;
-let account = null;
-
-window.connectWallet = connectWallet;
-window.createProposal = createProposal;
-window.castVote = castVote;
-window.viewProposal = viewProposal;
+<script>
+const API = 'https://voting-dao-backend.onrender.com';
 
 function showOutput(id, msg, isError) {
   const el = document.getElementById(id);
   el.textContent = msg;
   el.className = 'output show' + (isError ? ' error' : '');
-}
-
-function detectWallet() {
-  if (typeof window === 'undefined') return null;
-  if (window.rabby) return window.rabby.provider || window.ethereum;
-  if (window.ethereum?.isRabby) return window.ethereum;
-  if (window.ethereum?.isMetaMask) return window.ethereum;
-  if (window.ethereum) return window.ethereum;
-  return null;
-}
-
-async function connectWallet() {
-  const btn = document.getElementById('walletBtn');
-  btn.disabled = true;
-  btn.textContent = 'Connecting...';
-  
-  try {
-    const provider = detectWallet();
-    if (!provider) {
-      alert('No wallet detected. Please install MetaMask or Rabby.');
-      btn.disabled = false;
-      btn.textContent = 'Connect Wallet';
-      return;
-    }
-    
-    const currentChainId = await provider.request({ method: 'eth_chainId' });
-    if (currentChainId !== BRADBURY_CHAIN_ID) {
-      try {
-        await provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: BRADBURY_CHAIN_ID }],
-        });
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-          await provider.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: BRADBURY_CHAIN_ID,
-              chainName: 'GenLayer Bradbury Testnet',
-              rpcUrls: ['https://rpc-bradbury.genlayer.com'],
-              nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
-              blockExplorerUrls: ['https://explorer-bradbury.genlayer.com'],
-            }],
-          });
-        } else {
-          throw switchError;
-        }
-      }
-    }
-    
-    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-    if (!accounts || accounts.length === 0) {
-      alert('No accounts found. Please unlock your wallet.');
-      btn.disabled = false;
-      btn.textContent = 'Connect Wallet';
-      return;
-    }
-    
-    account = accounts[0];
-    client = createClient({ chain: chains.testnetBradbury, account });
-    
-    btn.textContent = account.slice(0, 6) + '...' + account.slice(-4);
-    btn.classList.add('connected');
-    btn.disabled = false;
-    
-    document.getElementById('walletStatus').style.display = 'flex';
-    document.getElementById('walletAddress').textContent = account.slice(0, 6) + '...' + account.slice(-4);
-    document.getElementById('infoBox').innerHTML = '<strong>Wallet connected.</strong> You can now create proposals, cast votes, and view results directly on GenLayer Bradbury.';
-    
-    document.getElementById('createBtn').disabled = false;
-    document.getElementById('createBtn').textContent = 'Create Proposal →';
-    document.getElementById('voteYesBtn').disabled = false;
-    document.getElementById('voteYesBtn').textContent = 'Vote Yes';
-    document.getElementById('voteNoBtn').disabled = false;
-    document.getElementById('voteNoBtn').textContent = 'Vote No';
-    document.getElementById('viewBtn').disabled = false;
-    document.getElementById('viewBtn').textContent = 'Fetch Proposal';
-    
-  } catch (err) {
-    console.error('Connection failed:', err);
-    alert('Connection failed: ' + (err.message || 'Unknown error'));
-    btn.disabled = false;
-    btn.textContent = 'Connect Wallet';
-  }
-}
-
-async function withRetry(fn, maxAttempts = 5) {
-  let attempt = 0;
-  let delay = 4000;
-  while (attempt < maxAttempts) {
-    try {
-      return await fn();
-    } catch (e) {
-      const msg = e?.error?.message ?? e?.message ?? '';
-      if (msg.includes('-32005') || msg.includes('rate limit') || msg.includes('empty')) {
-        console.warn(`Retry ${attempt + 1}/${maxAttempts} after ${delay}ms`);
-        await new Promise(r => setTimeout(r, delay));
-        delay *= 2;
-        attempt++;
-        continue;
-      }
-      throw e;
-    }
-  }
 }
 
 async function createProposal() {
@@ -474,26 +272,20 @@ async function createProposal() {
     return;
   }
   
-  const btn = document.getElementById('createBtn');
-  btn.disabled = true;
-  btn.textContent = 'Creating...';
-  
   try {
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'create_proposal',
-        args: [id, title, desc, parseInt(deadline)],
-        value: 0n,
-      });
+    const res = await fetch(`${API}/create-proposal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposal_id: id, title, description: desc, deadline: parseInt(deadline) })
     });
-    
-    showOutput('createOutput', `Proposal created successfully!\nTx: ${result.transactionHash}`, false);
+    const data = await res.json();
+    if (data.success) {
+      showOutput('createOutput', `Proposal created successfully!\nTx: ${data.tx_hash}`, false);
+    } else {
+      showOutput('createOutput', `Error: ${data.error || 'Unknown error'}`, true);
+    }
   } catch (err) {
-    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Create Proposal →';
+    showOutput('createOutput', `Error: ${err.message}`, true);
   }
 }
 
@@ -506,18 +298,19 @@ async function castVote(vote) {
   }
   
   try {
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'cast_vote',
-        args: [proposalId, vote],
-        value: 0n,
-      });
+    const res = await fetch(`${API}/cast-vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposal_id: proposalId, vote })
     });
-    
-    showOutput('voteOutput', `Vote cast successfully!\nTx: ${result.transactionHash}`, false);
+    const data = await res.json();
+    if (data.success) {
+      showOutput('voteOutput', `Vote cast successfully!\nTx: ${data.tx_hash}`, false);
+    } else {
+      showOutput('voteOutput', `Error: ${data.error || 'Unknown error'}`, true);
+    }
   } catch (err) {
-    showOutput('voteOutput', `Error: ${err.message || 'Unknown error'}`, true);
+    showOutput('voteOutput', `Error: ${err.message}`, true);
   }
 }
 
@@ -530,15 +323,15 @@ async function viewProposal() {
   }
   
   try {
-    const result = await client.readContract({
-      address: CONTRACT,
-      functionName: 'get_proposal',
-      args: [id],
-    });
-    
-    showOutput('viewOutput', `Proposal ${id}:\n${JSON.stringify(result, null, 2)}`, false);
+    const res = await fetch(`${API}/proposal/${id}`);
+    const data = await res.json();
+    if (data.exists) {
+      showOutput('viewOutput', `Proposal ${id}:\n${JSON.stringify(data, null, 2)}`, false);
+    } else {
+      showOutput('viewOutput', `Proposal not found`, true);
+    }
   } catch (err) {
-    showOutput('viewOutput', `Error: ${err.message || 'Unknown error'}`, true);
+    showOutput('viewOutput', `Error: ${err.message}`, true);
   }
 }
 
