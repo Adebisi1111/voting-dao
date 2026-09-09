@@ -19,10 +19,9 @@
 
     <header class="nav">
       <nav class="nav__links" aria-label="Primary">
-        <a href="#">Platform</a>
-        <a href="#">Solutions</a>
-        <a href="#">Company</a>
-        <a href="#">Pricing</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="#faq">FAQ</a>
       </nav>
 
       <a href="#" class="logo" aria-label="VotingDAO">
@@ -74,7 +73,7 @@
             </svg>
           </span>
         </a>
-        <a href="#" class="btn btn--ghost wipe" style="--d: 0.66s">
+        <a href="#how-it-works" class="btn btn--ghost wipe" style="--d: 0.66s">
           <span class="btn__label">See How It Works</span>
         </a>
       </div>
@@ -88,10 +87,9 @@
 
     <div class="mobile-menu" id="mobile-menu" hidden>
       <nav class="mobile-menu__links">
-        <a href="#">Platform</a>
-        <a href="#">Solutions</a>
-        <a href="#">Company</a>
-        <a href="#">Pricing</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <a href="#faq">FAQ</a>
       </nav>
       <a href="app.html" class="btn btn--nav">
         <span class="btn__label">Launch App</span>
@@ -103,6 +101,58 @@
       </a>
     </div>
   </main>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="how-it-works__inner">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step__number">1</div>
+          <h3>Create Proposal</h3>
+          <p>Submit a proposal with title, description, and deadline. Stake GEN to prevent spam.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">2</div>
+          <h3>Cast Votes</h3>
+          <p>Registered voters vote yes or no. One address, one vote per proposal.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">3</div>
+          <h3>AI Consensus</h3>
+          <p>Validators verify the final result. No manipulation possible.</p>
+        </div>
+        <div class="step">
+          <div class="step__number">4</div>
+          <h3>Finalize</h3>
+          <p>Results are permanent and verifiable on GenLayer Bradbury.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq" id="faq">
+    <div class="faq__inner">
+      <h2>FAQ</h2>
+      <div class="faq__item">
+        <h3 class="faq__question">What is VotingDAO?</h3>
+        <p class="faq__answer">VotingDAO is a decentralized governance platform built on GenLayer. It allows DAOs to create proposals, cast votes, and let AI consensus tally results — all without gas fees.</p>
+      </div>
+      <div class="faq__item">
+        <h3 class="faq__question">How does AI consensus work?</h3>
+        <p class="faq__answer">Validators independently verify the final result by re-running the tally from on-chain data. They only agree if the final verdict matches, ensuring no manipulation.</p>
+      </div>
+      <div class="faq__item">
+        <h3 class="faq__question">Why no wallet connection?</h3>
+        <p class="faq__answer">Transactions are relayed through our backend server, which signs with a private key. This eliminates gas fees for users and simplifies the experience.</p>
+      </div>
+      <div class="faq__item">
+        <h3 class="faq__question">What chain is this on?</h3>
+        <p class="faq__answer">VotingDAO is deployed on GenLayer Bradbury Testnet. You can verify all transactions on the Bradbury Explorer.</p>
+      </div>
+    </div>
+  </section>
 
   <script src="main.js"></script>
 </body>

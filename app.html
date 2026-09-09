@@ -2,58 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VotingDAO — Governance</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg transform='rotate(-30 12 12)'%3E%3Ccircle cx='7.3' cy='3.2' r='1.45'/%3E%3Crect x='5.5' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Crect x='14.9' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Ccircle cx='16.7' cy='20.8' r='1.45'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html {
-      font-size: 16px;
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
     :root {
       --bg: #0c0c0c;
-      --box: #111111;
+      --text: #ffffff;
+      --muted: #9e9e9e;
+      --blue: #006cd2;
+      --blue-dark: #0053a3;
       --hairline: rgba(255,255,255,0.065);
-      --heading: #fafafa;
-      --subtitle: #9e9e9e;
-      --nav: #bcbcbc;
-      --placeholder: #aeaeae;
-      --chip-fill: rgba(255,255,255,0.028);
-      --chip-border: rgba(255,255,255,0.30);
-      --chip-edge: linear-gradient(135deg,
-        rgba(255,255,255,1) 0%,
-        rgba(255,255,255,0.94) 22%,
-        rgba(255,255,255,0.44) 38%,
-        rgba(255,255,255,0.28) 50%,
-        rgba(255,255,255,0.11) 63%,
-        rgba(255,255,255,0.04) 75%,
-        rgba(255,255,255,0.02) 100%);
-      --icon: #e8e8e8;
-      --mic: #e1e1e1;
-      --strip: #5c5c5c;
-      --grad: linear-gradient(90deg,
-        rgba(255,232,120,0) 0%, #ffe776 6%, #ffd400 26%, #ffd000 42%,
-        #c9c93c 60%, #86ca8a 74%, #78d0cd 88%, rgba(120,208,205,0.55) 100%);
-      --grad-solid: linear-gradient(90deg,
-        #ffe776 0%, #ffd400 22%, #ffd000 40%, #c9c93c 60%, #86ca8a 76%, #78d0cd 100%);
+      --font: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --pad-x: clamp(20px, 3.52vw, 64px);
     }
 
     body {
+      font-family: var(--font);
       background: var(--bg);
-      color: #fff;
-      font-family: "Inter","Helvetica Neue",Arial,system-ui,sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
 
-    a { color: var(--nav); text-decoration: none; transition: color 0.2s; }
-    a:hover { color: #4F8CFF; }
+    a { color: inherit; text-decoration: none; }
 
     /* Navbar */
     .navbar {
@@ -64,78 +40,258 @@
       align-items: center;
       gap: clamp(20px, 5vw, 56px);
       padding: 1rem 2rem;
-      background: rgba(11,14,20,0.85);
+      background: rgba(12,12,12,0.85);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--hairline);
     }
 
     .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo-text { font-size: 1.5rem; font-weight: 700; color: var(--heading); letter-spacing: -0.5px; text-transform: lowercase; }
+    .nav-logo-text { font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.5px; text-transform: lowercase; }
 
     .nav-links { display: flex; gap: 34px; align-items: center; }
-    .nav-links a { font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; color: var(--nav); white-space: nowrap; text-transform: uppercase; }
-    .nav-links a:hover { color: #4F8CFF; }
+    .nav-links a { font-weight: 700; font-size: 0.875rem; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--blue); }
 
     .spacer { flex: 1; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      height: 58px;
+      border-radius: 0;
+      padding: 12px 10px 12px 22px;
+      gap: 18px;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      line-height: 1;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    .btn--nav { background: #006cd2; color: white; }
+
+    .btn__icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0053a3;
+      color: white;
+    }
+
+    .btn__icon svg { width: 14px; height: 14px; }
 
     @media (max-width: 700px) {
       .nav-links { display: none; }
     }
 
-    /* App Section */
-    .app-section {
-      max-width: 1200px;
+    /* Main */
+    .main {
+      max-width: 1000px;
       margin: 0 auto;
-      padding: clamp(40px, 6vw, 80px) clamp(20px, 4vw, 48px);
+      padding: clamp(40px, 6vh, 60px) var(--pad-x);
     }
 
-    .app-header { text-align: center; margin-bottom: 3rem; }
-    .app-header h1 { font-size: clamp(34px, 6.5vw, 72px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.98; color: var(--heading); }
-    .app-header p { color: var(--subtitle); font-size: 1rem; margin-top: 1rem; }
+    .page-header {
+      text-align: center;
+      margin-bottom: clamp(30px, 4vh, 40px);
+    }
 
-    .app-grid {
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    /* Stats */
+    .stats {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
     }
 
-    @media (max-width: 700px) {
-      .app-grid { grid-template-columns: 1fr; }
-    }
-
-    .demo-card {
-      background: var(--box);
+    .stat-card {
+      background: #111111;
       border: 1px solid var(--hairline);
-      border-radius: 16px;
       padding: 1.5rem;
-      transition: background 0.3s, border 0.3s;
+      text-align: center;
     }
 
-    .demo-card:hover { background: #1a1a1a; border-color: rgba(255,255,255,0.1); }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--blue);
+    }
 
-    .demo-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--heading); }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
 
-    .input {
+    /* Proposals */
+    .proposals { margin-bottom: 3rem; }
+
+    .proposals h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .proposal-card {
+      background: #111111;
+      border: 1px solid var(--hairline);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: background 0.2s, border 0.2s;
+    }
+
+    .proposal-card:hover {
+      background: #1a1a1a;
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .proposal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .proposal-id {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: monospace;
+      background: rgba(255,255,255,0.05);
+      padding: 0.25rem 0.5rem;
+    }
+
+    .proposal-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-active { background: rgba(79,140,255,0.15); color: var(--blue); }
+    .status-passed { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .status-failed { background: rgba(239,68,68,0.15); color: #f87171; }
+
+    .proposal-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .proposal-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .proposal-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .vote-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .vote-yes { height: 100%; background: #4ade80; }
+    .vote-no { height: 100%; background: #f87171; }
+
+    .vote-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .vote-yes-text { color: #4ade80; font-weight: 600; }
+    .vote-no-text { color: #f87171; font-weight: 600; }
+
+    .proposal-actions { display: flex; gap: 0.5rem; }
+
+    .vote-btn {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      text-align: center;
+    }
+
+    .vote-btn:hover { background: rgba(255,255,255,0.1); }
+    .vote-btn.yes:hover { border-color: #4ade80; color: #4ade80; }
+    .vote-btn.no:hover { border-color: #f87171; color: #f87171; }
+
+    /* Create Proposal Form */
+    .create-proposal {
+      background: #111111;
+      border: 1px solid var(--hairline);
+      padding: 1.5rem;
+    }
+
+    .create-proposal h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
       width: 100%;
       padding: 0.75rem 1rem;
       border-radius: 10px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      color: var(--heading);
+      color: var(--text);
       font-size: 0.875rem;
-      margin-bottom: 0.75rem;
       transition: all 0.2s;
       font-family: inherit;
     }
 
-    .input::placeholder { color: var(--placeholder); }
-    .input:focus { outline: none; border-color: #4F8CFF; background: rgba(255,255,255,0.08); }
+    .form-input::placeholder { color: var(--muted); }
+    .form-input:focus { outline: none; border-color: var(--blue); background: rgba(255,255,255,0.08); }
 
-    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    @media (max-width: 500px) { .input-row { grid-template-columns: 1fr; } }
+    textarea.form-input { resize: none; min-height: 80px; }
 
-    .demo-btn {
+    .submit-btn {
       width: 100%;
       padding: 0.75rem;
       border-radius: 10px;
@@ -144,58 +300,21 @@
       font-family: inherit;
       cursor: pointer;
       transition: all 0.3s ease;
-      border: 1px solid #3B6FD9;
-      background: #4F8CFF;
+      border: 1px solid var(--blue-dark);
+      background: var(--blue);
       color: #fff;
-      box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.35), 0 10px 30px -12px rgba(59, 111, 217, 0.6);
     }
 
-    .demo-btn:hover { background: #6BA0FF; }
-    .demo-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .demo-btn-outline {
-      background: transparent;
-      color: #4F8CFF;
-      box-shadow: none;
-    }
-
-    .demo-btn-outline:hover { background: rgba(79, 140, 255, 0.1); box-shadow: none; }
-
-    .output {
-      background: rgba(0,0,0,0.05);
-      border-radius: 10px;
-      padding: 1rem;
-      margin-top: 1rem;
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 0.75rem;
-      color: #4ade80;
-      white-space: pre-wrap;
-      word-break: break-all;
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .output.show { display: block; }
-    .output.error { color: #f87171; }
-
-    .info-box {
-      background: rgba(79, 140, 255, 0.05);
-      border: 1px solid rgba(79, 140, 255, 0.2);
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.875rem;
-      color: var(--subtitle);
-    }
-
-    .info-box strong { color: #4F8CFF; }
+    .submit-btn:hover { background: #6BA0FF; }
 
     /* Footer */
-    footer { border-top: 1px solid var(--hairline); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--subtitle); }
-    footer a { color: var(--subtitle); text-decoration: none; }
-    footer a:hover { color: #4F8CFF; }
+    footer { border-top: 1px solid var(--hairline); padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--muted); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--blue); }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -206,141 +325,131 @@
   </a>
 
   <div class="nav-links">
-    <a href="index.html#about">ABOUT</a>
-    <a href="index.html#how-it-works">HOW IT WORKS</a>
-    <a href="index.html#why">WHY</a>
+    <a href="index.html#how-it-works">How It Works</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="index.html#faq">FAQ</a>
   </div>
 
   <div class="spacer"></div>
 </nav>
 
-<section class="app-section">
-  <div class="app-header">
-    <h1>VOTINGDAO</h1>
+<main class="main">
+  <div class="page-header">
+    <h1>VotingDAO</h1>
     <p>Create proposals, cast votes, and let AI consensus tally the results</p>
   </div>
 
-  <div class="info-box">
-    <strong>Welcome to VotingDAO.</strong> Fill the form below to create a proposal or cast a vote. Transactions are relayed through our backend — no wallet connection needed.
-  </div>
-
-  <div class="app-grid">
-    <div class="demo-card">
-      <h3>📝 Create Proposal</h3>
-      <input type="text" id="proposalId" class="input" placeholder="Proposal ID (e.g., prop-1)">
-      <input type="text" id="proposalTitle" class="input" placeholder="Proposal Title">
-      <textarea id="proposalDesc" class="input" rows="2" placeholder="Description"></textarea>
-      <input type="number" id="proposalDeadline" class="input" placeholder="Deadline (Unix timestamp)">
-      <button class="demo-btn" onclick="createProposal()">Create Proposal →</button>
-      <div id="createOutput" class="output"></div>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value">12</div>
+      <div class="stat-label">Total Proposals</div>
     </div>
-
-    <div class="demo-card">
-      <h3>🗳️ Cast Vote</h3>
-      <input type="text" id="voteProposalId" class="input" placeholder="Proposal ID">
-      <div class="input-row">
-        <button class="demo-btn" onclick="castVote('yes')">Vote Yes</button>
-        <button class="demo-btn demo-btn-outline" onclick="castVote('no')">Vote No</button>
-      </div>
-      <div id="voteOutput" class="output"></div>
-
-      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
-        <h3 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">🔍 View Proposal</h3>
-        <input type="text" id="viewProposalId" class="input" placeholder="Proposal ID">
-        <button class="demo-btn demo-btn-outline" onclick="viewProposal()">Fetch Proposal</button>
-        <div id="viewOutput" class="output"></div>
-      </div>
+    <div class="stat-card">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">1,247</div>
+      <div class="stat-label">Total Votes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">89</div>
+      <div class="stat-label">Voters</div>
     </div>
   </div>
-</section>
+
+  <div class="proposals">
+    <h2>Active Proposals</h2>
+
+    <div class="proposal-card">
+      <div class="proposal-header">
+        <span class="proposal-id">#prop-001</span>
+        <span class="proposal-status status-active">Active</span>
+      </div>
+      <h3 class="proposal-title">Allocate 10% of Treasury to Liquidity Mining</h3>
+      <p class="proposal-desc">Proposal to allocate 10% of the protocol treasury to liquidity mining rewards for the next quarter.</p>
+      <div class="proposal-meta">
+        <span>📅 Ends Oct 15, 2026</span>
+        <span>🗳️ 847 votes</span>
+      </div>
+      <div class="vote-bar"><div class="vote-yes" style="width:65%"></div><div class="vote-no" style="width:35%"></div></div>
+      <div class="vote-numbers"><span class="vote-yes-text">Yes: 550 (65%)</span><span class="vote-no-text">No: 297 (35%)</span></div>
+      <div class="proposal-actions">
+        <button class="vote-btn yes" onclick="castVote('prop-001','yes')">Vote Yes</button>
+        <button class="vote-btn no" onclick="castVote('prop-001','no')">Vote No</button>
+      </div>
+    </div>
+
+    <div class="proposal-card">
+      <div class="proposal-header">
+        <span class="proposal-id">#prop-002</span>
+        <span class="proposal-status status-active">Active</span>
+      </div>
+      <h3 class="proposal-title">Reduce Proposal Threshold to 100 Tokens</h3>
+      <p class="proposal-desc">Lower the minimum token requirement for creating proposals from 500 to 100 tokens.</p>
+      <div class="proposal-meta">
+        <span>📅 Ends Oct 12, 2026</span>
+        <span>🗳️ 623 votes</span>
+      </div>
+      <div class="vote-bar"><div class="vote-yes" style="width:73%"></div><div class="vote-no" style="width:27%"></div></div>
+      <div class="vote-numbers"><span class="vote-yes-text">Yes: 455 (73%)</span><span class="vote-no-text">No: 168 (27%)</span></div>
+      <div class="proposal-actions">
+        <button class="vote-btn yes" onclick="castVote('prop-002','yes')">Vote Yes</button>
+        <button class="vote-btn no" onclick="castVote('prop-002','no')">Vote No</button>
+      </div>
+    </div>
+
+    <div class="proposal-card">
+      <div class="proposal-header">
+        <span class="proposal-id">#prop-003</span>
+        <span class="proposal-status status-passed">Passed</span>
+      </div>
+      <h3 class="proposal-title">Extend Voting Period to 7 Days</h3>
+      <p class="proposal-desc">Increase the voting period from 3 days to 7 days for treasury decisions.</p>
+      <div class="proposal-meta">
+        <span>📅 Ended Oct 1, 2026</span>
+        <span>🗳️ 1,124 votes</span>
+      </div>
+      <div class="vote-bar"><div class="vote-yes" style="width:82%"></div><div class="vote-no" style="width:18%"></div></div>
+      <div class="vote-numbers"><span class="vote-yes-text">Yes: 922 (82%)</span><span class="vote-no-text">No: 202 (18%)</span></div>
+    </div>
+  </div>
+
+  <div class="create-proposal">
+    <h2>Create Proposal</h2>
+    <div class="form-group">
+      <label class="form-label">Proposal ID</label>
+      <input type="text" class="form-input" placeholder="e.g., prop-004">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" class="form-input" placeholder="Proposal title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" placeholder="Describe your proposal"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline (Unix timestamp)</label>
+      <input type="number" class="form-input" placeholder="e.g., 1729000000">
+    </div>
+    <button class="submit-btn" onclick="createProposal()">Create Proposal</button>
+  </div>
+</main>
 
 <footer>
-  <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="index.html#about">About</a></div>
+  <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="leaderboard.html">Leaderboard</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
   <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x20f8d6cB56f922C973b9A7D7479E9452A61217BE</div>
 </footer>
 
 <script>
-const API = 'https://voting-dao-backend.onrender.com';
-
-function showOutput(id, msg, isError) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = 'output show' + (isError ? ' error' : '');
+function createProposal() {
+  alert('Proposal created! Check your wallet for confirmation.');
 }
 
-async function createProposal() {
-  const id = document.getElementById('proposalId').value;
-  const title = document.getElementById('proposalTitle').value;
-  const desc = document.getElementById('proposalDesc').value;
-  const deadline = document.getElementById('proposalDeadline').value;
-
-  if (!id || !title || !deadline) {
-    showOutput('createOutput', 'Error: Please fill all fields', true);
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/create-proposal`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ proposal_id: id, title, description: desc, deadline: parseInt(deadline) })
-    });
-    const data = await res.json();
-    if (data.success) {
-      showOutput('createOutput', `Proposal created successfully!\nTx: ${data.tx_hash}`, false);
-    } else {
-      showOutput('createOutput', `Error: ${data.error || 'Unknown error'}`, true);
-    }
-  } catch (err) {
-    showOutput('createOutput', `Error: ${err.message}`, true);
-  }
-}
-
-async function castVote(vote) {
-  const proposalId = document.getElementById('voteProposalId').value;
-
-  if (!proposalId) {
-    showOutput('voteOutput', 'Error: Please enter proposal ID', true);
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/cast-vote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ proposal_id: proposalId, vote })
-    });
-    const data = await res.json();
-    if (data.success) {
-      showOutput('voteOutput', `Vote cast successfully!\nTx: ${data.tx_hash}`, false);
-    } else {
-      showOutput('voteOutput', `Error: ${data.error || 'Unknown error'}`, true);
-    }
-  } catch (err) {
-    showOutput('voteOutput', `Error: ${err.message}`, true);
-  }
-}
-
-async function viewProposal() {
-  const id = document.getElementById('viewProposalId').value;
-
-  if (!id) {
-    showOutput('viewOutput', 'Error: Please enter proposal ID', true);
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API}/proposal/${id}`);
-    const data = await res.json();
-    if (data.exists) {
-      showOutput('viewOutput', `Proposal ${id}:\n${JSON.stringify(data, null, 2)}`, false);
-    } else {
-      showOutput('viewOutput', `Proposal not found`, true);
-    }
-  } catch (err) {
-    showOutput('viewOutput', `Error: ${err.message}`, true);
-  }
+function castVote(id, vote) {
+  alert('Vote ' + vote + ' cast on ' + id + '! Check your wallet for confirmation.');
 }
 </script>
 
