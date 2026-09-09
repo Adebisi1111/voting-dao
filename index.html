@@ -85,10 +85,7 @@
       height: clamp(34px,3.1vw,52px);
     }
 
-    .logo svg {
-      width: 100%;
-      height: 100%;
-    }
+    .logo svg { width: 100%; height: 100%; }
 
     .nav-links {
       display: flex;
@@ -107,9 +104,7 @@
 
     .nav-links a:hover { color: #f2f2f2; }
 
-    .topbar-cta {
-      justify-self: end;
-    }
+    .topbar-cta { justify-self: end; }
 
     .start-free {
       display: inline-flex;
@@ -226,9 +221,7 @@
 
     .composer-glow {
       position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
+      left: 0; right: 0; top: 0;
       bottom: calc(-1 * clamp(3px,0.35vw,6px));
       border-radius: inherit;
       background: var(--grad-solid);
@@ -278,10 +271,7 @@
       padding: 1px;
     }
 
-    .chip-btn svg {
-      width: 20px;
-      height: 20px;
-    }
+    .chip-btn svg { width: 20px; height: 20px; }
 
     .deeplink-chip {
       height: clamp(38px,3.23vw,54px);
@@ -354,10 +344,7 @@
       z-index: 1;
     }
 
-    .send-inner svg {
-      width: 44%;
-      height: 44%;
-    }
+    .send-inner svg { width: 44%; height: 44%; }
 
     /* Trust logos */
     .trust-logos {
@@ -398,10 +385,7 @@
       gap: clamp(1.5rem,4vh,2.5rem);
     }
 
-    .nav-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .nav-overlay.open { opacity: 1; pointer-events: auto; }
 
     .nav-overlay a {
       color: #fff;
@@ -421,9 +405,7 @@
 
     .nav-overlay-footer {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       padding: 2rem;
       text-align: center;
     }
@@ -436,10 +418,7 @@
       margin-bottom: 1rem;
     }
 
-    .nav-overlay-footer .start-free {
-      width: 100%;
-      justify-content: center;
-    }
+    .nav-overlay-footer .start-free { width: 100%; justify-content: center; }
 
     /* Section 2 */
     .section-two {
@@ -452,10 +431,7 @@
       .section-two { padding-top: clamp(130px,12.6vw,210px); }
     }
 
-    .section-two-inner {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
+    .section-two-inner { max-width: 1300px; margin: 0 auto; }
 
     .section-two h2 {
       font-weight: 400;
@@ -502,8 +478,7 @@
     }
 
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: #23d92c;
       box-shadow: 0 0 6px rgba(45,220,55,.65);
@@ -533,8 +508,7 @@
     .message.ai { justify-content: flex-start; }
 
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       border-radius: 50%;
       flex-shrink: 0;
       display: flex;
@@ -577,8 +551,7 @@
     .chat-input input::placeholder { color: #6b6b6d; }
 
     .chat-input button {
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
@@ -588,10 +561,7 @@
     }
 
     .chat-input .mic-btn { background: none; }
-    .chat-input .send-btn-input {
-      background: #0c0c0c;
-    }
-
+    .chat-input .send-btn-input { background: #0c0c0c; }
     .chat-input .send-btn-input svg { width: 16px; height: 16px; }
 
     /* Responsive */
@@ -912,7 +882,6 @@ function startAnimations() {
 
   document.documentElement.classList.add('entrance', 'entrance-s2');
 
-  // Section 1 timeline
   const logo = document.querySelector('.logo');
   const navLinks = document.querySelectorAll('.nav-links a');
   const startFree = document.querySelector('.start-free');
@@ -924,47 +893,36 @@ function startAnimations() {
   const glow = document.querySelector('.composer-glow');
   const trustLogos = document.querySelectorAll('.trust-logo');
 
-  // Logo
   animate(logo, [{opacity: 0, transform: 'scale(0.92)'}, {opacity: 1, transform: 'scale(1)'}], {duration: 600, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
 
-  // Nav links
   navLinks.forEach((link, i) => {
     animate(link, [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 500, delay: 100 + i * 50, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
   });
 
-  // Start free
   if (startFree) {
     animate(startFree, [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 500, delay: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
   }
 
-  // Headline lines
   hlLines.forEach((line, i) => {
     animate(line, [{opacity: 0, transform: 'translateY(108%)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 950, delay: 200 + i * 90, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards'});
   });
 
-  // Subtitle
   animate(subtitle, [{opacity: 0, transform: 'translateY(14px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 650, delay: 520, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
 
-  // Composer shell
   animate(composerShell, [{opacity: 0, transform: `translateY(${22*D}px) scale(0.985)`}, {opacity: 1, transform: 'translateY(0) scale(1)'}], {duration: 950, delay: 640, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards'});
 
-  // Placeholder
   animate(placeholder, [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 550, delay: 780, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
 
-  // Controls
   controls.forEach((ctrl, i) => {
     animate(ctrl, [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 500, delay: 840 + i * 55, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
   });
 
-  // Glow
   animate(glow, [{clipPath: 'inset(0 40% 0 40%)', opacity: 0}, {clipPath: 'inset(0 0% 0 0%)', opacity: 0.95}], {duration: 800, delay: 940, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards'});
 
-  // Trust logos
   trustLogos.forEach((logo, i) => {
     animate(logo, [{opacity: 0, transform: 'translateY(12px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 500, delay: 1080 + i * 60, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards'});
   });
 
-  // Complete
   setTimeout(() => {
     document.documentElement.classList.remove('entrance');
     document.documentElement.classList.add('hero-ready');
