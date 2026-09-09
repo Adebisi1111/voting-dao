@@ -1,0 +1,27 @@
+{
+  "name": "voting-dao",
+  "version": "1.0.0",
+  "description": "A decentralized voting platform built on GenLayer. Create proposals, cast votes, and let AI consensus tally the results.",
+  "main": "main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adebisi1111/voting-dao.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adebisi1111/voting-dao/issues"
+  },
+  "homepage": "https://github.com/Adebisi1111/voting-dao#readme",
+  "dependencies": {
+    "genlayer-js": "^1.1.8",
+    "viem": "^2.56.3"
+  }
+}
