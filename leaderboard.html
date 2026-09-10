@@ -184,8 +184,8 @@
     <h1>Leaderboard</h1>
     <p>Top voters and proposal creators on VotingDAO</p>
     <div id="registerBanner" style="display:none; margin-top: 1rem; padding: 1rem; background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.3); text-align: center;">
-      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">Register to vote and appear on the leaderboard</p>
-      <button id="registerBtn" class="wallet-btn" onclick="registerVoter()">Register to Vote</button>
+      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">Stake 0.1 GEN to appear on the leaderboard</p>
+      <button id="stakeBtn" class="wallet-btn" onclick="stakeToVote()">Stake 0.1 GEN to Vote</button>
     </div>
   </div>
 
@@ -206,7 +206,7 @@
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="app.html">App</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
-  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x8BAB49CF18Cf129977b7d12BF0558357b358113e</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x40BF5D54ca71D0909a638168a55fe934bdE8A3e9</div>
 </footer>
 
 <script type="module">
@@ -219,7 +219,7 @@ let client = null;
 let account = null;
 
 window.connectWallet = connectWallet;
-window.registerVoter = registerVoter;
+window.stakeToVote = stakeToVote;
 
 function detectWallet() {
   if (typeof window === 'undefined') return null;
@@ -319,7 +319,6 @@ async function loadLeaderboard() {
   list.innerHTML = '<div class="loading">Loading leaderboard...</div>';
 
   try {
-    // Get total proposals
     const count = await client.readContract({
       address: CONTRACT,
       functionName: 'get_proposals_count',
@@ -331,7 +330,6 @@ async function loadLeaderboard() {
       return;
     }
 
-    // Read all proposals to get real data
     let proposals = [];
     for (let i = 1; i <= 100; i++) {
       try {
@@ -348,14 +346,12 @@ async function loadLeaderboard() {
       if (proposals.length >= parseInt(count)) break;
     }
 
-    // Count votes per creator
     let totalVotes = 0;
     proposals.forEach(p => {
       const total = p.yes_votes + p.no_votes;
       totalVotes += total;
     });
 
-    // Check if current user has staked
     const staked = await client.readContract({
       address: CONTRACT,
       functionName: 'is_voter',
@@ -368,7 +364,6 @@ async function loadLeaderboard() {
       args: [account],
     });
 
-    // Show/hide stake banner
     const banner = document.getElementById('registerBanner');
     if (banner) {
       banner.style.display = staked === 'true' ? 'none' : 'block';
@@ -390,7 +385,6 @@ async function loadLeaderboard() {
       return;
     }
 
-    // Sort by votes
     rows.sort((a, b) => b.votes - a.votes);
 
     let html = '';
@@ -420,7 +414,7 @@ async function loadLeaderboard() {
 async function stakeToVote() {
   if (!client) { alert('Connect wallet first'); return; }
   try {
-    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    const btn = document.getElementById('stakeBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Staking...'; }
     
     alert('Staking 0.1 GEN...\nThis takes 2-3 minutes on GenLayer.');
@@ -429,7 +423,7 @@ async function stakeToVote() {
       address: CONTRACT,
       functionName: 'stake',
       args: [],
-      value: 100000000000000000n, // 0.1 GEN
+      value: 100000000000000000n,
     });
     
     console.log('Stake result:', result);
@@ -466,7 +460,7 @@ async function stakeToVote() {
     console.error('Stake error:', err);
     const errMsg = err?.error?.message || err?.message || JSON.stringify(err);
     alert('Error: ' + errMsg);
-    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    const btn = document.getElementById('stakeBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
   }
 }

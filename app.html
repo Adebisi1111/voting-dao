@@ -79,54 +79,51 @@
 
     /* Main */
     .main {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: clamp(30px, 4vh, 40px) var(--pad-x);
+      padding: clamp(40px, 6vh, 60px) var(--pad-x);
     }
 
     .page-header {
       text-align: center;
-      margin-bottom: clamp(25px, 3vh, 35px);
+      margin-bottom: clamp(30px, 4vh, 40px);
     }
 
     .page-header h1 {
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
       margin-bottom: 0.5rem;
     }
 
     .page-header p {
       color: var(--muted);
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
 
     .wallet-status {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 10px;
       margin-top: 1rem;
-      flex-wrap: wrap;
     }
 
     .wallet-address {
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 0.875rem;
-      color: var(--text);
+      font-family: monospace;
       background: rgba(255,255,255,0.05);
+      padding: 6px 12px;
+      font-size: 0.85rem;
       border: 1px solid var(--hairline);
-      padding: 0.5rem 1rem;
     }
 
     .network-badge {
-      font-size: 0.75rem;
-      font-weight: 700;
+      background: rgba(79,140,255,0.15);
+      color: #6ba0ff;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 0.5rem 1rem;
+      letter-spacing: 0.05em;
     }
 
     /* Stats */
@@ -134,72 +131,63 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin: clamp(30px, 4vh, 40px) 0;
     }
 
     .stat-card {
-      background: #111111;
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--hairline);
       padding: 1.25rem;
       text-align: center;
     }
 
     .stat-value {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--blue);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
 
     .stat-label {
       font-size: 0.75rem;
       color: var(--muted);
-      margin-top: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
     }
 
-    /* Section Title */
+    /* Proposals */
     .section-title {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      margin-top: 2rem;
     }
 
-    /* Proposal Cards */
     .proposal-card {
-      background: #111111;
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--hairline);
-      padding: 1.25rem;
-      margin-bottom: 0.75rem;
-      transition: background 0.2s, border 0.2s;
-    }
-
-    .proposal-card:hover {
-      background: #161616;
-      border-color: rgba(255,255,255,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .proposal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.75rem;
     }
 
     .proposal-id {
-      font-size: 0.7rem;
-      color: var(--muted);
       font-family: monospace;
-      background: rgba(255,255,255,0.05);
-      padding: 0.2rem 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
     }
 
     .proposal-status {
-      padding: 0.2rem 0.6rem;
-      font-size: 0.65rem;
+      padding: 4px 10px;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -212,71 +200,86 @@
 
     .proposal-title {
       font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 0.4rem;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
     }
 
     .proposal-desc {
-      font-size: 0.8rem;
       color: var(--muted);
-      margin-bottom: 0.75rem;
-      line-height: 1.45;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
     }
 
     .proposal-meta {
       display: flex;
-      gap: 1rem;
-      font-size: 0.75rem;
+      gap: 1.5rem;
+      font-size: 0.8rem;
       color: var(--muted);
       margin-bottom: 0.75rem;
     }
 
     .vote-bar {
-      height: 6px;
-      border-radius: 3px;
+      height: 8px;
       background: rgba(255,255,255,0.05);
-      margin-bottom: 0.5rem;
+      border-radius: 4px;
       overflow: hidden;
       display: flex;
     }
 
-    .vote-yes { height: 100%; background: #4ade80; }
-    .vote-no { height: 100%; background: #f87171; }
+    .vote-yes { background: #4ade80; height: 100%; }
+    .vote-no { background: #f87171; height: 100%; }
 
     .vote-numbers {
       display: flex;
       justify-content: space-between;
       font-size: 0.75rem;
-      margin-bottom: 0.75rem;
+      margin-top: 0.4rem;
     }
 
-    .vote-yes-text { color: #4ade80; font-weight: 600; }
-    .vote-no-text { color: #f87171; font-weight: 600; }
+    .vote-yes-text { color: #4ade80; }
+    .vote-no-text { color: #f87171; }
 
-    .proposal-actions { display: flex; gap: 0.5rem; }
+    .proposal-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
 
     .vote-btn {
       flex: 1;
-      padding: 0.5rem;
-      font-size: 0.75rem;
+      padding: 0.6rem;
+      border: none;
       font-weight: 600;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.05);
-      color: #fff;
+      font-family: inherit;
+    }
+
+    .vote-btn.yes { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .vote-btn.yes:hover { background: rgba(34,197,94,0.3); }
+
+    .vote-btn.no { background: rgba(239,68,68,0.15); color: #f87171; }
+    .vote-btn.no:hover { background: rgba(239,68,68,0.3); }
+
+    /* Stake Banner */
+    #registerBanner {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(79,140,255,0.1);
+      border: 1px solid rgba(79,140,255,0.3);
       text-align: center;
     }
 
-    .vote-btn:hover { background: rgba(255,255,255,0.1); }
-    .vote-btn.yes:hover { border-color: #4ade80; color: #4ade80; }
-    .vote-btn.no:hover { border-color: #f87171; color: #f87171; }
+    #registerBanner p {
+      color: #7eb6ee;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
 
-    .vote-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* Create Proposal Form */
+    /* Create Proposal */
     .create-proposal {
-      background: #111111;
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--hairline);
       padding: 1.25rem;
       margin-top: 2rem;
@@ -446,7 +449,7 @@
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="leaderboard.html">Leaderboard</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
-  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x8BAB49CF18Cf129977b7d12BF0558357b358113e</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x40BF5D54ca71D0909a638168a55fe934bdE8A3e9</div>
 </footer>
 
 <script type="module">
@@ -461,7 +464,7 @@ let account = null;
 window.connectWallet = connectWallet;
 window.createProposal = createProposal;
 window.castVote = castVote;
-window.registerVoter = registerVoter;
+window.stakeToVote = stakeToVote;
 
 function showOutput(id, msg, isError) {
   const el = document.getElementById(id);
@@ -536,7 +539,6 @@ async function connectWallet() {
     document.getElementById('walletAddress').textContent = account.slice(0, 6) + '...' + account.slice(-4);
 
     document.getElementById('createBtn').disabled = false;
-    document.getElementById('createBtn').textContent = 'Create Proposal →';
 
     await loadStats();
     await loadProposals();
@@ -546,6 +548,26 @@ async function connectWallet() {
     alert('Connection failed: ' + (err.message || 'Unknown error'));
     btn.disabled = false;
     btn.textContent = 'Connect Wallet';
+  }
+}
+
+async function withRetry(fn, maxAttempts = 5) {
+  let attempt = 0;
+  let delay = 4000;
+  while (attempt < maxAttempts) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = e?.error?.message ?? e?.message ?? '';
+      if (msg.includes('-32005') || msg.includes('rate limit') || msg.includes('empty')) {
+        console.warn(`Retry ${attempt + 1}/${maxAttempts} after ${delay}ms`);
+        await new Promise(r => setTimeout(r, delay));
+        delay *= 2;
+        attempt++;
+        continue;
+      }
+      throw e;
+    }
   }
 }
 
@@ -566,7 +588,6 @@ async function loadStats() {
       });
       document.getElementById('statStaked').textContent = staked === 'true' ? 'Yes' : 'No';
       
-      // Get user's vote count
       const voteCount = await client.readContract({
         address: CONTRACT,
         functionName: 'get_vote_count',
@@ -574,10 +595,9 @@ async function loadStats() {
       });
       document.getElementById('statVoters').textContent = voteCount;
       
-      // Show/hide stake banner
-      const registerBanner = document.getElementById('registerBanner');
-      if (registerBanner) {
-        registerBanner.style.display = staked === 'true' ? 'none' : 'block';
+      const banner = document.getElementById('registerBanner');
+      if (banner) {
+        banner.style.display = staked === 'true' ? 'none' : 'block';
       }
     }
   } catch (err) {
@@ -588,8 +608,7 @@ async function loadStats() {
 async function loadProposals() {
   const list = document.getElementById('proposalsList');
   
-  // Check registration first
-  const registered = await client.readContract({
+  const staked = await client.readContract({
     address: CONTRACT,
     functionName: 'is_voter',
     args: [account],
@@ -617,8 +636,7 @@ async function loadProposals() {
     }
 
     let proposals = [];
-    // Read all proposals (handle gaps in IDs)
-    for (let i = 1; i <= parseInt(count) + 10; i++) {
+    for (let i = 1; i <= 100; i++) {
       try {
         const proposal = await client.readContract({
           address: CONTRACT,
@@ -639,7 +657,6 @@ async function loadProposals() {
     const now = Math.floor(Date.now() / 1000);
     let activeCount = 0;
     let totalVotes = 0;
-    let yourVotes = 0;
     let html = '';
     proposals.forEach(p => {
       const total = p.yes_votes + p.no_votes;
@@ -673,40 +690,18 @@ async function loadProposals() {
     });
     list.innerHTML = html;
 
-    // Update stats
     document.getElementById('statActive').textContent = activeCount;
     document.getElementById('statVoters').textContent = totalVotes;
-    document.getElementById('statRegistered').textContent = account ? 'Yes' : 'No';
 
   } catch (err) {
     list.innerHTML = '<div class="loading">Error loading proposals: ' + err.message + '</div>';
   }
 }
 
-async function withRetry(fn, maxAttempts = 5) {
-  let attempt = 0;
-  let delay = 4000;
-  while (attempt < maxAttempts) {
-    try {
-      return await fn();
-    } catch (e) {
-      const msg = e?.error?.message ?? e?.message ?? '';
-      if (msg.includes('-32005') || msg.includes('rate limit') || msg.includes('empty')) {
-        console.warn(`Retry ${attempt + 1}/${maxAttempts} after ${delay}ms`);
-        await new Promise(r => setTimeout(r, delay));
-        delay *= 2;
-        attempt++;
-        continue;
-      }
-      throw e;
-    }
-  }
-}
-
 async function stakeToVote() {
   if (!client) { alert('Connect wallet first'); return; }
   try {
-    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    const btn = document.getElementById('stakeBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Staking...'; }
     
     showOutput('createOutput', 'Staking 0.1 GEN...\nThis takes 2-3 minutes on GenLayer.', false);
@@ -715,7 +710,7 @@ async function stakeToVote() {
       address: CONTRACT,
       functionName: 'stake',
       args: [],
-      value: 100000000000000000n, // 0.1 GEN
+      value: 100000000000000000n,
     });
     
     console.log('Stake result:', result);
@@ -753,10 +748,11 @@ async function stakeToVote() {
     console.error('Stake error:', err);
     const errMsg = err?.error?.message || err?.message || JSON.stringify(err);
     showOutput('createOutput', `Error: ${errMsg}`, true);
-    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    const btn = document.getElementById('stakeBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
   }
 }
+
 async function createProposal() {
   const id = document.getElementById('proposalId').value;
   const title = document.getElementById('proposalTitle').value;
@@ -773,16 +769,14 @@ async function createProposal() {
   btn.textContent = 'Creating...';
 
   try {
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'create_proposal',
-        args: [id, title, desc, parseInt(deadline)],
-        value: 0n,
-      });
+    const result = await client.writeContract({
+      address: CONTRACT,
+      functionName: 'create_proposal',
+      args: [id, title, desc, parseInt(deadline)],
+      value: 0n,
     });
 
-    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
+    const txHash = result?.transactionHash || result?.txId || result?.hash || 'Transaction submitted';
     showOutput('createOutput', `Proposal created successfully!\nTx: ${txHash}`, false);
     document.getElementById('proposalId').value = '';
     document.getElementById('proposalTitle').value = '';
@@ -801,21 +795,19 @@ async function createProposal() {
 async function castVote(proposalId, vote) {
   if (!client) { alert('Connect wallet first'); return; }
   try {
-    // Check if user is registered
-    const registered = await client.readContract({
+    const staked = await client.readContract({
       address: CONTRACT,
       functionName: 'is_voter',
       args: [account],
     });
     
-    if (registered !== 'true') {
-      showOutput('createOutput', 'Error: You must register to vote first.\nClick the "Register to Vote" button above.', true);
+    if (staked !== 'true') {
+      showOutput('createOutput', 'Error: You must stake 0.1 GEN to vote first.', true);
       return;
     }
     
     showOutput('createOutput', 'Casting vote...', false);
     
-    // Read proposal BEFORE voting
     const before = await client.readContract({
       address: CONTRACT,
       functionName: 'get_proposal',
@@ -840,26 +832,21 @@ async function castVote(proposalId, vote) {
     
     const beforeVotes = beforeProposal.yes_votes + beforeProposal.no_votes;
     
-    // Cast vote
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'cast_vote',
-        args: [proposalId, vote],
-        value: 0n,
-      });
+    const result = await client.writeContract({
+      address: CONTRACT,
+      functionName: 'cast_vote',
+      args: [proposalId, vote],
+      value: 0n,
     });
     
-    // Check transaction result
     const txResult = result?.txExecutionResult ?? result?.result;
     const txResultName = result?.txExecutionResultName || '';
     
     if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
-      showOutput('createOutput', `Transaction failed: ${txResultName}\nPossible reasons: Already voted, proposal resolved, or consensus rejected.`, true);
+      showOutput('createOutput', `Transaction failed: ${txResultName}\nAlready voted, proposal resolved, or consensus rejected.`, true);
       return;
     }
     
-    // Read proposal AFTER voting
     const after = await client.readContract({
       address: CONTRACT,
       functionName: 'get_proposal',
