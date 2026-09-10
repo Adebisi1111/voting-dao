@@ -631,17 +631,6 @@ async function loadProposals() {
     return;
   }
   
-  const staked = await client.readContract({
-    address: CONTRACT,
-    functionName: 'is_voter',
-    args: [account],
-  });
-  
-  if (staked !== 'true') {
-    list.innerHTML = '<div class="loading">Stake 0.1 GEN to view and vote on proposals.</div>';
-    return;
-  }
-  
   list.innerHTML = '<div class="loading">Loading proposals...</div>';
 
   try {
