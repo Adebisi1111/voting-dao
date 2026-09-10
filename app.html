@@ -442,7 +442,7 @@
       <label class="form-label">Deadline (Unix timestamp)</label>
       <input type="number" class="form-input" id="proposalDeadline" placeholder="e.g., 1729000000">
     </div>
-    <button class="submit-btn" id="createBtn" onclick="createProposal()" disabled>Connect Wallet First</button>
+    <button class="submit-btn" id="createBtn" onclick="createProposal()" disabled>Create Proposal</button>
     <div id="createOutput" class="output"></div>
   </div>
 </main>
@@ -549,6 +549,7 @@ async function connectWallet() {
 
     updateWalletUI(true);
     document.getElementById('createBtn').disabled = false;
+    document.getElementById('createBtn').textContent = 'Create Proposal →';
 
     await loadStats();
     await loadProposals();
@@ -565,7 +566,7 @@ function disconnectWallet() {
   account = null;
   updateWalletUI(false);
   document.getElementById('createBtn').disabled = true;
-  document.getElementById('createBtn').textContent = 'Connect Wallet First';
+  document.getElementById('createBtn').textContent = 'Create Proposal';
   document.getElementById('proposalsList').innerHTML = '<div class="loading">Connect wallet to view proposals</div>';
   document.getElementById('statProposals').textContent = '—';
   document.getElementById('statActive').textContent = '—';
