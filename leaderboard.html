@@ -203,13 +203,13 @@
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="app.html">App</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
-  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x8BAB49CF18Cf129977b7d12BF0558357b358113e</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE</div>
 </footer>
 
 <script type="module">
 import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
 
-const CONTRACT = '0x8BAB49CF18Cf129977b7d12BF0558357b358113e';
+const CONTRACT = '0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE';
 const BRADBURY_CHAIN_ID = '0x107D';
 
 let client = null;
@@ -322,21 +322,22 @@ async function loadLeaderboard() {
     }
 
     // Count votes per creator
-    const creatorVotes = {};
     let totalVotes = 0;
     proposals.forEach(p => {
       const total = p.yes_votes + p.no_votes;
       totalVotes += total;
-      if (p.creator) {
-        if (!creatorVotes[p.creator]) creatorVotes[p.creator] = 0;
-        creatorVotes[p.creator] += total;
-      }
     });
 
-    // Check if current user is registered
+    // Check if current user is registered and get vote count
     const registered = await client.readContract({
       address: CONTRACT,
       functionName: 'is_voter',
+      args: [account],
+    });
+    
+    const voteCount = await client.readContract({
+      address: CONTRACT,
+      functionName: 'get_vote_count',
       args: [account],
     });
 
@@ -351,7 +352,7 @@ async function loadLeaderboard() {
       rows.push({
         address: account,
         name: 'You',
-        votes: creatorVotes[account] || 0,
+        votes: parseInt(voteCount) || 0,
         proposals: proposals.filter(p => p.creator === account).length,
         success: 100,
       });

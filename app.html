@@ -406,8 +406,8 @@
       <div class="stat-label">Active</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" id="statVoters">—</div>
-      <div class="stat-label">Your Votes</div>
+    <div class="stat-value" id="statVoters">—</div>
+    <div class="stat-label">My Votes</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" id="statRegistered">—</div>
@@ -446,13 +446,13 @@
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="leaderboard.html">Leaderboard</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
-  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x8BAB49CF18Cf129977b7d12BF0558357b358113e</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE</div>
 </footer>
 
 <script type="module">
 import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
 
-const CONTRACT = '0x8BAB49CF18Cf129977b7d12BF0558357b358113e';
+const CONTRACT = '0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE';
 const BRADBURY_CHAIN_ID = '0x107D';
 
 let client = null;
@@ -565,6 +565,14 @@ async function loadStats() {
         args: [account],
       });
       document.getElementById('statRegistered').textContent = registered === 'true' ? 'Yes' : 'No';
+      
+      // Get user's vote count
+      const voteCount = await client.readContract({
+        address: CONTRACT,
+        functionName: 'get_vote_count',
+        args: [account],
+      });
+      document.getElementById('statVoters').textContent = voteCount;
       
       // Show/hide register banner
       const registerBanner = document.getElementById('registerBanner');
