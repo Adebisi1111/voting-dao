@@ -712,7 +712,8 @@ async function createProposal() {
       });
     });
 
-    showOutput('createOutput', `Proposal created successfully!\nTx: ${result.transactionHash}`, false);
+    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
+    showOutput('createOutput', `Proposal created successfully!\nTx: ${txHash}`, false);
     document.getElementById('proposalId').value = '';
     document.getElementById('proposalTitle').value = '';
     document.getElementById('proposalDesc').value = '';
@@ -739,11 +740,12 @@ async function castVote(proposalId, vote) {
         value: 0n,
       });
     });
-    showOutput('createOutput', `Vote "${vote}" cast on ${proposalId}!\nTx: ${result.transactionHash}`, false);
+    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
+    showOutput('createOutput', `Vote "${vote}" cast on ${proposalId}!\nTx: ${txHash}`, false);
     await loadProposals();
     await loadStats();
   } catch (err) {
-    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
+    showOutput('createOutput`, `Error: ${err.message || 'Unknown error'}`, true);
   }
 }
 </script>
