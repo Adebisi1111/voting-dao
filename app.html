@@ -208,6 +208,7 @@
     .status-active { background: rgba(79,140,255,0.15); color: #6ba0ff; }
     .status-passed { background: rgba(34,197,94,0.15); color: #4ade80; }
     .status-failed { background: rgba(239,68,68,0.15); color: #f87171; }
+    .status-expired { background: rgba(245,158,11,0.15); color: #fbbf24; }
 
     .proposal-title {
       font-weight: 600;
@@ -389,7 +390,10 @@
       <span class="wallet-address" id="walletAddress"></span>
       <span class="network-badge">GenLayer Bradbury</span>
     </div>
-    <button id="registerBtn" class="wallet-btn" onclick="registerVoter()" style="margin-top: 1rem; display: none;">Register to Vote</button>
+    <div id="registerBanner" style="display:none; margin-top: 1rem; padding: 1rem; background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.3); text-align: center;">
+      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">You must register to vote on proposals</p>
+      <button id="registerBtn" class="wallet-btn" onclick="registerVoter()">Register to Vote</button>
+    </div>
   </div>
 
   <div class="stats">
@@ -534,8 +538,8 @@ async function connectWallet() {
     document.getElementById('createBtn').disabled = false;
     document.getElementById('createBtn').textContent = 'Create Proposal →';
 
-    await loadProposals();
     await loadStats();
+    await loadProposals();
 
   } catch (err) {
     console.error('Connection failed:', err);
@@ -562,10 +566,10 @@ async function loadStats() {
       });
       document.getElementById('statRegistered').textContent = registered === 'true' ? 'Yes' : 'No';
       
-      // Show/hide register button
-      const registerBtn = document.getElementById('registerBtn');
-      if (registerBtn) {
-        registerBtn.style.display = registered === 'true' ? 'none' : 'inline-flex';
+      // Show/hide register banner
+      const registerBanner = document.getElementById('registerBanner');
+      if (registerBanner) {
+        registerBanner.style.display = registered === 'true' ? 'none' : 'block';
       }
     }
   } catch (err) {
@@ -575,6 +579,19 @@ async function loadStats() {
 
 async function loadProposals() {
   const list = document.getElementById('proposalsList');
+  
+  // Check registration first
+  const registered = await client.readContract({
+    address: CONTRACT,
+    functionName: 'is_voter',
+    args: [account],
+  });
+  
+  if (registered !== 'true') {
+    list.innerHTML = '<div class="loading">You must register to vote. Click the "Register to Vote" button above.</div>';
+    return;
+  }
+  
   list.innerHTML = '<div class="loading">Loading proposals...</div>';
 
   try {
@@ -623,8 +640,8 @@ async function loadProposals() {
       const noPct = total > 0 ? Math.round(p.no_votes / total * 100) : 0;
       const isActive = !p.resolved;
       if (isActive && now < p.deadline) activeCount++;
-      const isExpired = now >= p.deadline;
-      const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : (isExpired ? 'status-failed' : 'status-active');
+      const isExpired = isActive && now >= p.deadline;
+      const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : (isExpired ? 'status-expired' : 'status-active');
       const statusText = p.resolved ? p.result : (isExpired ? 'EXPIRED' : 'ACTIVE');
 
       html += '<div class="proposal-card">' +
@@ -748,6 +765,18 @@ async function createProposal() {
 async function castVote(proposalId, vote) {
   if (!client) { alert('Connect wallet first'); return; }
   try {
+    // Check if user is registered
+    const registered = await client.readContract({
+      address: CONTRACT,
+      functionName: 'is_voter',
+      args: [account],
+    });
+    
+    if (registered !== 'true') {
+      showOutput('createOutput', 'Error: You must register to vote first.\nClick the "Register to Vote" button above.', true);
+      return;
+    }
+    
     showOutput('createOutput', 'Casting vote...', false);
     
     // Read proposal BEFORE voting
@@ -764,6 +793,12 @@ async function castVote(proposalId, vote) {
     }
     if (beforeProposal.resolved) {
       showOutput('createOutput', 'Error: Proposal already resolved', true);
+      return;
+    }
+    
+    const now = Math.floor(Date.now() / 1000);
+    if (now >= beforeProposal.deadline) {
+      showOutput('createOutput', 'Error: Voting deadline has passed', true);
       return;
     }
     
@@ -784,7 +819,6 @@ async function castVote(proposalId, vote) {
     const txResultName = result?.txExecutionResultName || '';
     
     if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
-      // Transaction failed on-chain
       showOutput('createOutput', `Transaction failed: ${txResultName}\nPossible reasons: Already voted, proposal resolved, or consensus rejected.`, true);
       return;
     }
