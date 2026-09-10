@@ -183,7 +183,10 @@
   <div class="page-header">
     <h1>Leaderboard</h1>
     <p>Top voters and proposal creators on VotingDAO</p>
-    <button id="registerBtn" class="wallet-btn" onclick="registerVoter()" style="margin-top: 1rem; display: none;">Register to Vote</button>
+    <div id="registerBanner" style="display:none; margin-top: 1rem; padding: 1rem; background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.3); text-align: center;">
+      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">You must register to vote to appear on the leaderboard</p>
+      <button id="registerBtn" class="wallet-btn" onclick="registerVoter()">Register to Vote</button>
+    </div>
   </div>
 
   <div class="leaderboard">
@@ -360,6 +363,8 @@ async function loadLeaderboard() {
 
     if (rows.length === 0) {
       list.innerHTML = '<div class="loading">Register to vote to appear on the leaderboard</div>';
+      const banner = document.getElementById('registerBanner');
+      if (banner) banner.style.display = 'block';
       return;
     }
 
