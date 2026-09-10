@@ -206,13 +206,13 @@
 <footer>
   <div style="margin-bottom:0.5rem"><a href="https://github.com/Adebisi1111/voting-dao" target="_blank">GitHub</a> · <a href="index.html">Home</a> · <a href="app.html">App</a></div>
   <div>© 2026 VotingDAO — Built on GenLayer</div>
-  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE</div>
+  <div style="margin-top:0.5rem;opacity:0.7">Contract: 0x7Db4111eD0254bF7536609679845A21d9EDce52F</div>
 </footer>
 
 <script type="module">
 import { createClient, chains } from 'https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm';
 
-const CONTRACT = '0x1c879aF42b31f5aA739fb6957e168E29C9a15AcE';
+const CONTRACT = '0x7Db4111eD0254bF7536609679845A21d9EDce52F';
 const BRADBURY_CHAIN_ID = '0x107D';
 
 let client = null;
@@ -418,57 +418,57 @@ async function loadLeaderboard() {
   }
 }
 
-async function registerVoter() {
+async function stakeToVote() {
   if (!client) { alert('Connect wallet first'); return; }
   try {
-    const btn = document.getElementById('registerBtn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
+    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Staking...'; }
     
-    alert('Submitting registration...\nThis takes 2-3 minutes on GenLayer.');
+    alert('Staking 0.1 GEN...\nThis takes 2-3 minutes on GenLayer.');
     
     const result = await client.writeContract({
       address: CONTRACT,
-      functionName: 'register_voter',
+      functionName: 'stake',
       args: [],
-      value: 0n,
+      value: 100000000000000000n, // 0.1 GEN
     });
     
-    console.log('Registration result:', result);
+    console.log('Stake result:', result);
     
     const txResult = result?.txExecutionResult ?? result?.result;
     const txResultName = result?.txExecutionResultName || '';
     const txHash = result?.transactionHash || result?.txId || result?.hash;
     
     if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
-      alert('Registration failed: ' + txResultName);
-      if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
+      alert('Staking failed: ' + txResultName);
+      if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
       return;
     }
     
-    alert('Registration submitted!\nTx: ' + (txHash || 'Pending...') + '\nWaiting for confirmation...');
+    alert('Stake submitted!\nTx: ' + (txHash || 'Pending...') + '\nWaiting for confirmation...');
     
     await new Promise(r => setTimeout(r, 5000));
     
-    const registered = await client.readContract({
+    const staked = await client.readContract({
       address: CONTRACT,
       functionName: 'is_voter',
       args: [account],
     });
     
-    if (registered === 'true') {
-      alert('Registered successfully!\nYou can now vote on proposals.');
+    if (staked === 'true') {
+      alert('Staked successfully!\nYou can now vote on proposals.');
       await loadLeaderboard();
     } else {
       alert('Transaction submitted but not yet confirmed.\nPlease wait 2-3 minutes, then refresh.');
     }
     
-    if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
   } catch (err) {
-    console.error('Registration error:', err);
+    console.error('Stake error:', err);
     const errMsg = err?.error?.message || err?.message || JSON.stringify(err);
     alert('Error: ' + errMsg);
-    const btn = document.getElementById('registerBtn');
-    if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
+    const btn = document.getElementById('stakeBtn') || document.getElementById('registerBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
   }
 }
 </script>
