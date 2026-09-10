@@ -406,12 +406,12 @@
       <div class="stat-label">Active</div>
     </div>
     <div class="stat-card">
-    <div class="stat-value" id="statVoters">—</div>
-    <div class="stat-label">My Votes</div>
+      <div class="stat-value" id="statVoters">—</div>
+      <div class="stat-label">My Votes</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" id="statRegistered">—</div>
-      <div class="stat-label">Registered</div>
+      <div class="stat-value" id="statStaked">—</div>
+      <div class="stat-label">Staked</div>
     </div>
   </div>
 
@@ -559,12 +559,12 @@ async function loadStats() {
     document.getElementById('statProposals').textContent = count;
 
     if (account) {
-      const registered = await client.readContract({
+      const staked = await client.readContract({
         address: CONTRACT,
         functionName: 'is_voter',
         args: [account],
       });
-      document.getElementById('statRegistered').textContent = registered === 'true' ? 'Yes' : 'No';
+      document.getElementById('statStaked').textContent = staked === 'true' ? 'Yes' : 'No';
       
       // Get user's vote count
       const voteCount = await client.readContract({
@@ -574,10 +574,10 @@ async function loadStats() {
       });
       document.getElementById('statVoters').textContent = voteCount;
       
-      // Show/hide register banner
+      // Show/hide stake banner
       const registerBanner = document.getElementById('registerBanner');
       if (registerBanner) {
-        registerBanner.style.display = registered === 'true' ? 'none' : 'block';
+        registerBanner.style.display = staked === 'true' ? 'none' : 'block';
       }
     }
   } catch (err) {
@@ -595,7 +595,7 @@ async function loadProposals() {
     args: [account],
   });
   
-  if (registered !== 'true') {
+  if (staked !== 'true') {
     list.innerHTML = '<div class="loading" style="padding: 3rem 1rem;"><p style="color: #7eb6ee; font-size: 1rem; margin-bottom: 1rem;">Stake 0.1 GEN to vote on proposals.</p><button class="wallet-btn" onclick="stakeToVote()" style="margin: 0 auto;">Stake 0.1 GEN to Vote</button></div>';
     return;
   }
