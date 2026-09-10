@@ -424,20 +424,31 @@ async function registerVoter() {
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
     
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'register_voter',
-        args: [],
-        value: 0n,
-      });
+    const result = await client.writeContract({
+      address: CONTRACT,
+      functionName: 'register_voter',
+      args: [],
+      value: 0n,
     });
     
-    const txHash = result?.transactionHash || result?.txId || result?.hash || 'Transaction submitted';
-    alert('Registered successfully! Tx: ' + txHash);
+    console.log('Registration result:', result);
+    
+    const txHash = result?.transactionHash || result?.txId || result?.hash;
+    const txResult = result?.txExecutionResult ?? result?.result;
+    const txResultName = result?.txExecutionResultName || '';
+    
+    if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
+      alert('Registration failed: ' + txResultName);
+      if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
+      return;
+    }
+    
+    alert('Registered successfully!' + (txHash ? '\nTx: ' + txHash : ''));
     await loadLeaderboard();
   } catch (err) {
-    alert('Error: ' + (err.message || 'Unknown error'));
+    console.error('Registration error:', err);
+    const errMsg = err?.error?.message || err?.message || JSON.stringify(err);
+    alert('Error: ' + errMsg);
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   }

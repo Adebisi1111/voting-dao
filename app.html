@@ -596,8 +596,8 @@ async function loadProposals() {
   });
   
   if (registered !== 'true') {
-    list.innerHTML = '<div class="loading">You must register to vote. Click the "Register to Vote" button above.</div>';
-    return;
+  list.innerHTML = '<div class="loading" style="padding: 3rem 1rem;"><p style="color: #7eb6ee; font-size: 1rem; margin-bottom: 1rem;">You must register to vote on proposals.</p><button class="wallet-btn" onclick="registerVoter()" style="margin: 0 auto;">Register to Vote</button></div>';
+  return;
   }
   
   list.innerHTML = '<div class="loading">Loading proposals...</div>';
@@ -709,21 +709,38 @@ async function registerVoter() {
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
     
-    const result = await withRetry(async () => {
-      return await client.writeContract({
-        address: CONTRACT,
-        functionName: 'register_voter',
-        args: [],
-        value: 0n,
-      });
+    console.log('Starting registration...');
+    const result = await client.writeContract({
+      address: CONTRACT,
+      functionName: 'register_voter',
+      args: [],
+      value: 0n,
     });
     
-    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
-    showOutput('createOutput', `Registered successfully!\nTx: ${txHash}`, false);
+    console.log('Registration result:', result);
+    
+    // Handle different response formats
+    const txHash = result?.transactionHash || result?.txId || result?.hash;
+    const txResult = result?.txExecutionResult ?? result?.result;
+    const txResultName = result?.txExecutionResultName || '';
+    
+    if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
+      showOutput('createOutput', `Registration failed: ${txResultName}`, true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
+      return;
+    }
+    
+    if (!txHash) {
+      showOutput('createOutput', `Registration submitted but no tx hash returned. Check wallet for confirmation.`, false);
+    } else {
+      showOutput('createOutput', `Registered successfully!\nTx: ${txHash}`, false);
+    }
+    
     await loadStats();
     await loadProposals();
   } catch (err) {
-    showOutput('createOutput', `Error: ${err.message || 'Unknown error'}`, true);
+    console.error('Registration error:', err);
+    showOutput('createOutput', `Error: ${err.message || err?.error?.message || 'Unknown error'}`, true);
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   }
