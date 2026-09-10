@@ -609,18 +609,18 @@ async function loadProposals() {
     }
 
     let proposals = [];
-    for (let i = 0; i < parseInt(count); i++) {
+    // Read all proposals (handle gaps in IDs)
+    for (let i = 1; i <= parseInt(count) + 10; i++) {
       try {
         const proposal = await client.readContract({
           address: CONTRACT,
           functionName: 'get_proposal',
-          args: ['prop-00' + (i + 1)],
+          args: ['prop-' + i.toString().padStart(3, '0')],
         });
         const p = JSON.parse(proposal);
         if (p.exists) proposals.push(p);
-      } catch (e) {
-        // Skip missing proposals
-      }
+      } catch (e) {}
+      if (proposals.length >= parseInt(count)) break;
     }
 
     if (proposals.length === 0) {
