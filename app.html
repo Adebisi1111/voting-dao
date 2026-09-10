@@ -621,10 +621,11 @@ async function loadProposals() {
       totalVotes += total;
       const yesPct = total > 0 ? Math.round(p.yes_votes / total * 100) : 0;
       const noPct = total > 0 ? Math.round(p.no_votes / total * 100) : 0;
-      const isActive = !p.resolved && now < p.deadline;
-      if (isActive) activeCount++;
-      const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : 'status-active';
-      const statusText = p.resolved ? p.result : 'ACTIVE';
+      const isActive = !p.resolved;
+      if (isActive && now < p.deadline) activeCount++;
+      const isExpired = now >= p.deadline;
+      const statusClass = p.resolved ? (p.result === 'PASS' ? 'status-passed' : 'status-failed') : (isExpired ? 'status-failed' : 'status-active');
+      const statusText = p.resolved ? p.result : (isExpired ? 'EXPIRED' : 'ACTIVE');
 
       html += '<div class="proposal-card">' +
         '<div class="proposal-header">' +
@@ -749,13 +750,14 @@ async function castVote(proposalId, vote) {
   try {
     showOutput('createOutput', 'Casting vote...', false);
     
-    // Read proposal BEFORE voting to get current state
+    // Read proposal BEFORE voting
     const before = await client.readContract({
       address: CONTRACT,
       functionName: 'get_proposal',
       args: [proposalId],
     });
     const beforeProposal = JSON.parse(before);
+    
     if (!beforeProposal.exists) {
       showOutput('createOutput', 'Error: Proposal does not exist', true);
       return;
@@ -764,6 +766,7 @@ async function castVote(proposalId, vote) {
       showOutput('createOutput', 'Error: Proposal already resolved', true);
       return;
     }
+    
     const beforeVotes = beforeProposal.yes_votes + beforeProposal.no_votes;
     
     // Cast vote
@@ -776,14 +779,17 @@ async function castVote(proposalId, vote) {
       });
     });
     
-    // Check if transaction succeeded
-    const txResult = result?.txExecutionResult || result?.result;
-    if (txResult === 2 || txResult === 'FINISHED_WITH_ERROR') {
-      showOutput('createOutput', 'Error: Transaction failed. You may have already voted or proposal is resolved.', true);
+    // Check transaction result
+    const txResult = result?.txExecutionResult ?? result?.result;
+    const txResultName = result?.txExecutionResultName || '';
+    
+    if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
+      // Transaction failed on-chain
+      showOutput('createOutput', `Transaction failed: ${txResultName}\nPossible reasons: Already voted, proposal resolved, or consensus rejected.`, true);
       return;
     }
     
-    // Read proposal AFTER voting to verify
+    // Read proposal AFTER voting
     const after = await client.readContract({
       address: CONTRACT,
       functionName: 'get_proposal',
@@ -792,14 +798,13 @@ async function castVote(proposalId, vote) {
     const afterProposal = JSON.parse(after);
     const afterVotes = afterProposal.yes_votes + afterProposal.no_votes;
     
-    // Verify vote count increased
     if (afterVotes <= beforeVotes) {
-      showOutput('createOutput', 'Error: Vote did not register. You may have already voted.', true);
+      showOutput('createOutput', 'Error: Vote did not register. Vote count unchanged.', true);
       return;
     }
     
-    const txHash = result?.transactionHash || result?.txId || result?.hash || 'Transaction submitted';
-    showOutput('createOutput', `Vote "${vote}" cast on ${proposalId}!\nTx: ${txHash}`, false);
+    const txHash = result?.transactionHash || result?.txId || result?.hash || 'N/A';
+    showOutput('createOutput', `SUCCESS! Vote "${vote}" cast on ${proposalId}\nYes: ${afterProposal.yes_votes} | No: ${afterProposal.no_votes}\nTx: ${txHash}`, false);
     await loadProposals();
     await loadStats();
   } catch (err) {
