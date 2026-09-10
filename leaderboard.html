@@ -424,6 +424,8 @@ async function registerVoter() {
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
     
+    alert('Submitting registration...\nThis takes 2-3 minutes on GenLayer.');
+    
     const result = await client.writeContract({
       address: CONTRACT,
       functionName: 'register_voter',
@@ -433,9 +435,9 @@ async function registerVoter() {
     
     console.log('Registration result:', result);
     
-    const txHash = result?.transactionHash || result?.txId || result?.hash;
     const txResult = result?.txExecutionResult ?? result?.result;
     const txResultName = result?.txExecutionResultName || '';
+    const txHash = result?.transactionHash || result?.txId || result?.hash;
     
     if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
       alert('Registration failed: ' + txResultName);
@@ -443,8 +445,24 @@ async function registerVoter() {
       return;
     }
     
-    alert('Registered successfully!' + (txHash ? '\nTx: ' + txHash : ''));
-    await loadLeaderboard();
+    alert('Registration submitted!\nTx: ' + (txHash || 'Pending...') + '\nWaiting for confirmation...');
+    
+    await new Promise(r => setTimeout(r, 5000));
+    
+    const registered = await client.readContract({
+      address: CONTRACT,
+      functionName: 'is_voter',
+      args: [account],
+    });
+    
+    if (registered === 'true') {
+      alert('Registered successfully!\nYou can now vote on proposals.');
+      await loadLeaderboard();
+    } else {
+      alert('Transaction submitted but not yet confirmed.\nPlease wait 2-3 minutes, then refresh.');
+    }
+    
+    if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   } catch (err) {
     console.error('Registration error:', err);
     const errMsg = err?.error?.message || err?.message || JSON.stringify(err);

@@ -709,7 +709,8 @@ async function registerVoter() {
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
     
-    console.log('Starting registration...');
+    showOutput('createOutput', 'Submitting registration...\nThis takes 2-3 minutes on GenLayer.', false);
+    
     const result = await client.writeContract({
       address: CONTRACT,
       functionName: 'register_voter',
@@ -719,10 +720,10 @@ async function registerVoter() {
     
     console.log('Registration result:', result);
     
-    // Handle different response formats
-    const txHash = result?.transactionHash || result?.txId || result?.hash;
+    // Check if successful
     const txResult = result?.txExecutionResult ?? result?.result;
     const txResultName = result?.txExecutionResultName || '';
+    const txHash = result?.transactionHash || result?.txId || result?.hash;
     
     if (txResult === 2 || txResultName === 'FINISHED_WITH_ERROR') {
       showOutput('createOutput', `Registration failed: ${txResultName}`, true);
@@ -730,22 +731,34 @@ async function registerVoter() {
       return;
     }
     
-    if (!txHash) {
-      showOutput('createOutput', `Registration submitted but no tx hash returned. Check wallet for confirmation.`, false);
+    showOutput('createOutput', `Registration submitted!\nTx: ${txHash || 'Pending...'}\nWaiting for confirmation...`, false);
+    
+    // Wait a moment then verify
+    await new Promise(r => setTimeout(r, 5000));
+    
+    const registered = await client.readContract({
+      address: CONTRACT,
+      functionName: 'is_voter',
+      args: [account],
+    });
+    
+    if (registered === 'true') {
+      showOutput('createOutput', `Registered successfully!\nYou can now vote on proposals.`, false);
+      await loadStats();
+      await loadProposals();
     } else {
-      showOutput('createOutput', `Registered successfully!\nTx: ${txHash}`, false);
+      showOutput('createOutput', `Transaction submitted but not yet confirmed.\nPlease wait 2-3 minutes, then refresh.`, false);
     }
     
-    await loadStats();
-    await loadProposals();
+    if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   } catch (err) {
     console.error('Registration error:', err);
-    showOutput('createOutput', `Error: ${err.message || err?.error?.message || 'Unknown error'}`, true);
+    const errMsg = err?.error?.message || err?.message || JSON.stringify(err);
+    showOutput('createOutput', `Error: ${errMsg}`, true);
     const btn = document.getElementById('registerBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   }
 }
-
 async function createProposal() {
   const id = document.getElementById('proposalId').value;
   const title = document.getElementById('proposalTitle').value;
