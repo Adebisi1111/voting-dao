@@ -752,7 +752,7 @@ async function stakeToVote() {
     
     // Poll for finalization
     let confirmed = false;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 10000));
       try {
         const staked = await client.readContract({
@@ -769,7 +769,7 @@ async function stakeToVote() {
     }
     
     if (confirmed) {
-      showOutput('createOutput', `Staked successfully!\nYou can now vote on proposals.`, false);
+      showOutput('createOutput', `Staked successfully!\nLoading proposals...`, false);
       await loadStats();
       await loadProposals();
     } else {
