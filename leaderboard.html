@@ -184,7 +184,7 @@
     <h1>Leaderboard</h1>
     <p>Top voters and proposal creators on VotingDAO</p>
     <div id="registerBanner" style="display:none; margin-top: 1rem; padding: 1rem; background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.3); text-align: center;">
-      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">You must register to vote to appear on the leaderboard</p>
+      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">Register to vote and appear on the leaderboard</p>
       <button id="registerBtn" class="wallet-btn" onclick="registerVoter()">Register to Vote</button>
     </div>
   </div>
@@ -219,6 +219,7 @@ let client = null;
 let account = null;
 
 window.connectWallet = connectWallet;
+window.registerVoter = registerVoter;
 
 function detectWallet() {
   if (typeof window === 'undefined') return null;
@@ -293,6 +294,26 @@ async function connectWallet() {
   }
 }
 
+async function withRetry(fn, maxAttempts = 5) {
+  let attempt = 0;
+  let delay = 4000;
+  while (attempt < maxAttempts) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = e?.error?.message ?? e?.message ?? '';
+      if (msg.includes('-32005') || msg.includes('rate limit') || msg.includes('empty')) {
+        console.warn(`Retry ${attempt + 1}/${maxAttempts} after ${delay}ms`);
+        await new Promise(r => setTimeout(r, delay));
+        delay *= 2;
+        attempt++;
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
 async function loadLeaderboard() {
   const list = document.getElementById('leaderboardList');
   list.innerHTML = '<div class="loading">Loading leaderboard...</div>';
@@ -312,16 +333,19 @@ async function loadLeaderboard() {
 
     // Read all proposals to get real data
     let proposals = [];
-    for (let i = 0; i < parseInt(count); i++) {
+    for (let i = 1; i <= 100; i++) {
       try {
-        const p = await client.readContract({
-          address: CONTRACT,
-          functionName: 'get_proposal',
-          args: ['prop-00' + (i + 1)],
+        const p = await withRetry(async () => {
+          return await client.readContract({
+            address: CONTRACT,
+            functionName: 'get_proposal',
+            args: ['prop-' + i.toString().padStart(3, '0')],
+          });
         });
         const proposal = JSON.parse(p);
         if (proposal.exists) proposals.push(proposal);
       } catch (e) {}
+      if (proposals.length >= parseInt(count)) break;
     }
 
     // Count votes per creator
@@ -344,10 +368,10 @@ async function loadLeaderboard() {
       args: [account],
     });
 
-    // Show/hide register button
-    const registerBtn = document.getElementById('registerBtn');
-    if (registerBtn) {
-      registerBtn.style.display = registered === 'true' ? 'none' : 'inline-flex';
+    // Show/hide register banner
+    const banner = document.getElementById('registerBanner');
+    if (banner) {
+      banner.style.display = registered === 'true' ? 'none' : 'block';
     }
 
     let rows = [];
@@ -362,9 +386,8 @@ async function loadLeaderboard() {
     }
 
     if (rows.length === 0) {
-      list.innerHTML = '<div class="loading">Register to vote to appear on the leaderboard</div>';
-      const banner = document.getElementById('registerBanner');
-      if (banner) banner.style.display = 'block';
+      // Show registration prompt in the list area
+      list.innerHTML = '<div class="loading" style="padding: 3rem 1rem;"><p style="color: #7eb6ee; font-size: 1rem; margin-bottom: 1rem;">You must register to vote to appear on the leaderboard.</p></div>';
       return;
     }
 
@@ -410,7 +433,7 @@ async function registerVoter() {
       });
     });
     
-    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
+    const txHash = result?.transactionHash || result?.txId || result?.hash || 'Transaction submitted';
     alert('Registered successfully! Tx: ' + txHash);
     await loadLeaderboard();
   } catch (err) {
