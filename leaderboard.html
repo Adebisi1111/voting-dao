@@ -183,6 +183,7 @@
   <div class="page-header">
     <h1>Leaderboard</h1>
     <p>Top voters and proposal creators on VotingDAO</p>
+    <button id="registerBtn" class="wallet-btn" onclick="registerVoter()" style="margin-top: 1rem; display: none;">Register to Vote</button>
   </div>
 
   <div class="leaderboard">
@@ -332,32 +333,32 @@ async function loadLeaderboard() {
       }
     });
 
-    // Known addresses to check
-    const knownVoters = [
-      { address: '0x782abaE1C6C4aec093C964785a4c10C0991Fa01A', name: 'You' },
-    ];
+    // Check if current user is registered
+    const registered = await client.readContract({
+      address: CONTRACT,
+      functionName: 'is_voter',
+      args: [account],
+    });
+
+    // Show/hide register button
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+      registerBtn.style.display = registered === 'true' ? 'none' : 'inline-flex';
+    }
 
     let rows = [];
-    for (const voter of knownVoters) {
-      try {
-        const registered = await client.readContract({
-          address: CONTRACT,
-          functionName: 'is_voter',
-          args: [voter.address],
-        });
-        if (registered === 'true') {
-          rows.push({
-            ...voter,
-            votes: creatorVotes[voter.address] || 0,
-            proposals: proposals.filter(p => p.creator === voter.address).length,
-            success: 100,
-          });
-        }
-      } catch (e) {}
+    if (registered === 'true') {
+      rows.push({
+        address: account,
+        name: 'You',
+        votes: creatorVotes[account] || 0,
+        proposals: proposals.filter(p => p.creator === account).length,
+        success: 100,
+      });
     }
 
     if (rows.length === 0) {
-      list.innerHTML = '<div class="loading">No registered voters found</div>';
+      list.innerHTML = '<div class="loading">Register to vote to appear on the leaderboard</div>';
       return;
     }
 
@@ -385,6 +386,31 @@ async function loadLeaderboard() {
 
   } catch (err) {
     list.innerHTML = '<div class="loading">Error loading leaderboard: ' + err.message + '</div>';
+  }
+}
+
+async function registerVoter() {
+  if (!client) { alert('Connect wallet first'); return; }
+  try {
+    const btn = document.getElementById('registerBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Registering...'; }
+    
+    const result = await withRetry(async () => {
+      return await client.writeContract({
+        address: CONTRACT,
+        functionName: 'register_voter',
+        args: [],
+        value: 0n,
+      });
+    });
+    
+    const txHash = result?.transactionHash || result?.hash || 'Transaction submitted';
+    alert('Registered successfully! Tx: ' + txHash);
+    await loadLeaderboard();
+  } catch (err) {
+    alert('Error: ' + (err.message || 'Unknown error'));
+    const btn = document.getElementById('registerBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Register to Vote'; }
   }
 }
 </script>
