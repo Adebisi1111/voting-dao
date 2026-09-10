@@ -72,6 +72,8 @@
     .wallet-btn:hover { background: #6BA0FF; }
     .wallet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .wallet-btn.connected { background: #10b981; }
+    .wallet-btn.disconnect { background: rgba(255,255,255,0.1); color: var(--muted); padding: 8px 16px; font-size: 0.8rem; }
+    .wallet-btn.disconnect:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
     @media (max-width: 700px) {
       .nav-links { display: none; }
@@ -100,7 +102,7 @@
       font-size: 1.1rem;
     }
 
-    .wallet-status {
+    .wallet-info {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -263,7 +265,7 @@
     .vote-btn.no:hover { background: rgba(239,68,68,0.3); }
 
     /* Stake Banner */
-    #registerBanner {
+    .stake-banner {
       margin-top: 1.5rem;
       padding: 1.5rem;
       background: rgba(79,140,255,0.1);
@@ -271,7 +273,7 @@
       text-align: center;
     }
 
-    #registerBanner p {
+    .stake-banner p {
       color: #7eb6ee;
       margin-bottom: 1rem;
       font-size: 1rem;
@@ -382,21 +384,20 @@
 
   <div class="spacer"></div>
 
-  <button id="walletBtn" class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+  <div id="walletContainer" style="display: flex; align-items: center; gap: 8px;">
+    <button id="walletBtn" class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+  </div>
 </nav>
 
 <main class="main">
   <div class="page-header">
     <h1>VotingDAO</h1>
     <p>Decentralized Governance on GenLayer</p>
-    <div class="wallet-status" id="walletStatus" style="display:none;">
-      <span class="wallet-address" id="walletAddress"></span>
-      <span class="network-badge">GenLayer Bradbury</span>
-    </div>
-    <div id="registerBanner" style="display:none; margin-top: 1rem; padding: 1rem; background: rgba(79,140,255,0.1); border: 1px solid rgba(79,140,255,0.3); text-align: center;">
-      <p style="color: #7eb6ee; margin-bottom: 0.75rem; font-size: 0.9rem;">Stake 0.1 GEN to vote on proposals</p>
-      <button id="stakeBtn" class="wallet-btn" onclick="stakeToVote()">Stake 0.1 GEN to Vote</button>
-    </div>
+  </div>
+
+  <div id="stakeBanner" class="stake-banner" style="display:none;">
+    <p>Stake 0.1 GEN to vote on proposals</p>
+    <button id="stakeBtn" class="wallet-btn" onclick="stakeToVote()">Stake 0.1 GEN to Vote</button>
   </div>
 
   <div class="stats">
@@ -465,6 +466,7 @@ window.connectWallet = connectWallet;
 window.createProposal = createProposal;
 window.castVote = castVote;
 window.stakeToVote = stakeToVote;
+window.disconnectWallet = disconnectWallet;
 
 function showOutput(id, msg, isError) {
   const el = document.getElementById(id);
@@ -481,17 +483,32 @@ function detectWallet() {
   return null;
 }
 
+function updateWalletUI(connected) {
+  const container = document.getElementById('walletContainer');
+  const stakeBanner = document.getElementById('stakeBanner');
+  
+  if (connected && account) {
+    container.innerHTML = `
+      <span class="wallet-address">${account.slice(0, 6)}...${account.slice(-4)}</span>
+      <span class="network-badge">GenLayer Bradbury</span>
+      <button class="wallet-btn disconnect" onclick="disconnectWallet()">Disconnect</button>
+    `;
+    stakeBanner.style.display = 'block';
+  } else {
+    container.innerHTML = `<button id="walletBtn" class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>`;
+    stakeBanner.style.display = 'none';
+  }
+}
+
 async function connectWallet() {
   const btn = document.getElementById('walletBtn');
-  btn.disabled = true;
-  btn.textContent = 'Connecting...';
+  if (btn) { btn.disabled = true; btn.textContent = 'Connecting...'; }
 
   try {
     const provider = detectWallet();
     if (!provider) {
       alert('No wallet detected. Please install MetaMask or Rabby.');
-      btn.disabled = false;
-      btn.textContent = 'Connect Wallet';
+      if (btn) { btn.disabled = false; btn.textContent = 'Connect Wallet'; }
       return;
     }
 
@@ -523,21 +540,14 @@ async function connectWallet() {
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     if (!accounts || accounts.length === 0) {
       alert('No accounts found. Please unlock your wallet.');
-      btn.disabled = false;
-      btn.textContent = 'Connect Wallet';
+      if (btn) { btn.disabled = false; btn.textContent = 'Connect Wallet'; }
       return;
     }
 
     account = accounts[0];
     client = createClient({ chain: chains.testnetBradbury, account });
 
-    btn.textContent = account.slice(0, 6) + '...' + account.slice(-4);
-    btn.classList.add('connected');
-    btn.disabled = false;
-
-    document.getElementById('walletStatus').style.display = 'flex';
-    document.getElementById('walletAddress').textContent = account.slice(0, 6) + '...' + account.slice(-4);
-
+    updateWalletUI(true);
     document.getElementById('createBtn').disabled = false;
 
     await loadStats();
@@ -546,9 +556,21 @@ async function connectWallet() {
   } catch (err) {
     console.error('Connection failed:', err);
     alert('Connection failed: ' + (err.message || 'Unknown error'));
-    btn.disabled = false;
-    btn.textContent = 'Connect Wallet';
+    updateWalletUI(false);
   }
+}
+
+function disconnectWallet() {
+  client = null;
+  account = null;
+  updateWalletUI(false);
+  document.getElementById('createBtn').disabled = true;
+  document.getElementById('createBtn').textContent = 'Connect Wallet First';
+  document.getElementById('proposalsList').innerHTML = '<div class="loading">Connect wallet to view proposals</div>';
+  document.getElementById('statProposals').textContent = '—';
+  document.getElementById('statActive').textContent = '—';
+  document.getElementById('statVoters').textContent = '—';
+  document.getElementById('statStaked').textContent = '—';
 }
 
 async function withRetry(fn, maxAttempts = 5) {
@@ -594,11 +616,6 @@ async function loadStats() {
         args: [account],
       });
       document.getElementById('statVoters').textContent = voteCount;
-      
-      const banner = document.getElementById('registerBanner');
-      if (banner) {
-        banner.style.display = staked === 'true' ? 'none' : 'block';
-      }
     }
   } catch (err) {
     console.error('Failed to load stats:', err);
@@ -608,6 +625,11 @@ async function loadStats() {
 async function loadProposals() {
   const list = document.getElementById('proposalsList');
   
+  if (!account) {
+    list.innerHTML = '<div class="loading">Connect wallet to view proposals</div>';
+    return;
+  }
+  
   const staked = await client.readContract({
     address: CONTRACT,
     functionName: 'is_voter',
@@ -615,7 +637,7 @@ async function loadProposals() {
   });
   
   if (staked !== 'true') {
-    list.innerHTML = '<div class="loading" style="padding: 3rem 1rem;"><p style="color: #7eb6ee; font-size: 1rem; margin-bottom: 1rem;">Stake 0.1 GEN to vote on proposals.</p><button class="wallet-btn" onclick="stakeToVote()" style="margin: 0 auto;">Stake 0.1 GEN to Vote</button></div>';
+    list.innerHTML = '<div class="loading">Stake 0.1 GEN to view and vote on proposals.</div>';
     return;
   }
   
