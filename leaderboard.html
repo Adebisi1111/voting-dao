@@ -471,21 +471,30 @@ async function stakeToVote() {
       return;
     }
     
-    alert('Stake submitted!\nTx: ' + (txHash || 'Pending...') + '\nWaiting for confirmation...');
+    alert('Stake accepted!\nTx: ' + (txHash || 'Pending...') + '\nFinalizing on-chain...');
     
-    await new Promise(r => setTimeout(r, 5000));
+    let confirmed = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 10000));
+      try {
+        const staked = await client.readContract({
+          address: CONTRACT,
+          functionName: 'is_voter',
+          args: [account],
+        });
+        if (staked === 'true') {
+          confirmed = true;
+          break;
+        }
+      } catch (e) {}
+      alert('Stake accepted!\nFinalizing... (' + ((i+1)*10) + 's)');
+    }
     
-    const staked = await client.readContract({
-      address: CONTRACT,
-      functionName: 'is_voter',
-      args: [account],
-    });
-    
-    if (staked === 'true') {
+    if (confirmed) {
       alert('Staked successfully!\nYou can now vote on proposals.');
       await loadLeaderboard();
     } else {
-      alert('Transaction submitted but not yet confirmed.\nPlease wait 2-3 minutes, then refresh.');
+      alert('Stake accepted but still finalizing.\nPlease refresh in a few minutes.');
     }
     
     if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }

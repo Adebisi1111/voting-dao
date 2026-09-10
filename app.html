@@ -748,22 +748,32 @@ async function stakeToVote() {
       return;
     }
     
-    showOutput('createOutput', `Stake submitted!\nTx: ${txHash || 'Pending...'}\nWaiting for confirmation...`, false);
+    showOutput('createOutput', `Stake accepted!\nTx: ${txHash || 'Pending...'}\nFinalizing on-chain...`, false);
     
-    await new Promise(r => setTimeout(r, 5000));
+    // Poll for finalization
+    let confirmed = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 10000));
+      try {
+        const staked = await client.readContract({
+          address: CONTRACT,
+          functionName: 'is_voter',
+          args: [account],
+        });
+        if (staked === 'true') {
+          confirmed = true;
+          break;
+        }
+      } catch (e) {}
+      showOutput('createOutput', `Stake accepted!\nFinalizing... (${(i+1)*10}s)`, false);
+    }
     
-    const staked = await client.readContract({
-      address: CONTRACT,
-      functionName: 'is_voter',
-      args: [account],
-    });
-    
-    if (staked === 'true') {
+    if (confirmed) {
       showOutput('createOutput', `Staked successfully!\nYou can now vote on proposals.`, false);
       await loadStats();
       await loadProposals();
     } else {
-      showOutput('createOutput', `Transaction submitted but not yet confirmed.\nPlease wait 2-3 minutes, then refresh.`, false);
+      showOutput('createOutput', `Stake accepted but still finalizing.\nPlease refresh in a few minutes.`, false);
     }
     
     if (btn) { btn.disabled = false; btn.textContent = 'Stake 0.1 GEN to Vote'; }
